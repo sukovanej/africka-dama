@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'org.milansuk'
+version '1.0-dev'
+
+repositories {
+    mavenCentral()
+}
+
+mainClassName = "entrypoint.Main"
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
