@@ -35,4 +35,10 @@ public class TestPosition {
 
         assertEquals(expected, position);
     }
+
+    @Test
+    public void testPositionToStriong() {
+        assertEquals(Position.fromBoardPosition('c', 5), new Position(4, 2));
+        assertEquals(Position.fromBoardPosition('c', 5).toString(), "[c, 5]");
+    }
 }

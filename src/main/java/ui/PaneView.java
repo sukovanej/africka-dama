@@ -1,40 +1,57 @@
 package ui;
 
-import javafx.scene.Group;
-import javafx.scene.Scene;
+import entities.Position;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class PaneView {
-    final private Rectangle pane;
-    final private Scene scene;
-    final private Integer row;
-    final private Integer column;
+    private final Pane root;
+    private final Position position;
+    private final Rectangle pane;
 
-    public PaneView(Scene scene, int row, int column) {
-        this.scene = scene;
-        this.row = row;
-        this.column = column;
+    public PaneView(Pane root, Position position) {
+        this.root = root;
+        this.position = position;
+        this.pane = new Rectangle();
 
-        this.pane = createView();
+        initializeView();
     }
 
     public void startRender() {
-        var group = (Group)scene.getRoot();
-        group.getChildren().add(pane);
+        root.getChildren().add(pane);
     }
 
-    private Rectangle createView() {
-        var size = scene.getWidth() / 9;
-        var pane = new Rectangle();
+    private void initializeView() {
+        var size = root.getWidth() / 9;
 
-        pane.setX(size * column);
-        pane.setY(size * row);
+        pane.setX(size * (position.getColumn()));
+        pane.setY(size * (8 - position.getRow()));
         pane.setWidth(size);
         pane.setHeight(size);
-        pane.setFill(((row + column) % 2 == 0) ? Color.DARKGRAY : Color.BROWN);
-        pane.setStroke(Color.BLACK);
+        pane.setStrokeWidth(1);
 
+        resetView();
+    }
+
+    public void resetView() {
+        pane.setFill(((position.getRow() + position.getColumn()) % 2 == 0) ? Color.DARKGRAY : Color.BROWN);
+        pane.setStroke(Color.BLACK);
+    }
+
+    public void highlight() {
+        pane.setFill(Color.HOTPINK);
+    }
+
+    public void highlightPossibles() {
+        pane.setFill(Color.LIGHTPINK);
+    }
+
+    public Rectangle getView() {
         return pane;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 }

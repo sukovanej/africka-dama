@@ -11,117 +11,141 @@ public class PossibleMovesLogic {
         this.board = board;
     }
 
-    public Set<Position> getQueenPossibleMoves(Piece piece, Position position) {
-        var positions = new HashSet<Position>();
+    public Set<Move> getQueenPossibleMoves(Piece piece) {
+        boolean jumpsOnly = false;
+        var moves = new HashSet<Move>();
+        var jumps = new HashSet<Move>();
 
         var movements = Arrays.asList(
-                new PositionDiff(1 ,-1),
-                new PositionDiff(1 ,0),
-                new PositionDiff(1 ,1),
-                new PositionDiff(0 ,-1),
-                new PositionDiff(0 ,1),
-                new PositionDiff(-1 ,-1),
-                new PositionDiff(-1 ,0),
-                new PositionDiff(-1 ,1)
+                new PositionDiff(1, -1),
+                new PositionDiff(1, 0),
+                new PositionDiff(1, 1),
+                new PositionDiff(0, -1),
+                new PositionDiff(0, 1),
+                new PositionDiff(-1, -1),
+                new PositionDiff(-1, 0),
+                new PositionDiff(-1, 1)
         );
 
-        for (var movement: movements) {
+        var position = piece.getPosition();
+
+        for (var movement : movements) {
             var nextPosition = position.add(movement);
 
             while (nextPosition.isOnBoard() && !board.getPieceOnPosition(nextPosition).isPresent()) {
-                positions.add(nextPosition);
-                nextPosition.addInPlace(movement);
-            }
-        }
+                if (!jumpsOnly)
+                    moves.add(new Move(PieceMove.Move(piece, nextPosition)));
 
-        return positions;
-    }
-
-    public Set<Position> getPossibleMoves(Piece piece, Position position) {
-        if (piece.isQueen()) {
-            return getQueenPossibleMoves(piece, position);
-        }
-
-        var topThreshold = 8;
-        var movement = 1;
-
-        if (piece.getKind() == PieceKind.BLACK) {
-            topThreshold = 0;
-            movement = - 1;
-        }
-
-        var positions = new HashSet<Position>();
-
-        if (position.getRow() != topThreshold) {
-            positions.add(new Position(position.getColumn(), position.getRow() + movement));
-
-            if (position.getColumn() > 0) {
-                positions.add(new Position(position.getColumn() - 1, position.getRow() + movement));
+                nextPosition = nextPosition.add(movement);
             }
 
-            if (position.getColumn() < 8) {
-                positions.add(new Position(position.getColumn() + 1, position.getRow() + movement));
-            }
-        }
+            if (nextPosition.isOnBoard()) {
+                var possibleNextPiece = board.getPieceOnPosition(nextPosition);
+                var secondNextPosition = nextPosition.add(movement);
 
-        if (position.getColumn() > 0) {
-            positions.add(new Position(position.getColumn() - 1, position.getRow()));
-        }
+                if (possibleNextPiece.isPresent()
+                        && secondNextPosition.isOnBoard()
+                        && !board.getPieceOnPosition(secondNextPosition).isPresent()) {
+                    var nextPiece = possibleNextPiece.get();
 
-        if (position.getColumn() < 8) {
-            positions.add(new Position(position.getColumn() + 1, position.getRow()));
-        }
+                    if (nextPiece.getKind() != piece.getKind()) {
+                        nextPosition = nextPosition.add(movement);
 
-        return positions;
-    }
-
-    public Set<Move> getJumpingMoves(Piece piece, Position piecePosition) {
-        var moves = new HashSet<Move>();
-
-        for (var position : getPossibleMoves(piece, piecePosition)) {
-            var nextPossiblePiece = board.getPieceOnPosition(position);
-
-            if (nextPossiblePiece.isPresent()) {
-                var nextPiece = nextPossiblePiece.get();
-                if (nextPossiblePiece.get().getKind() == piece.getKind()) continue;
-
-                var secondNextPosition = position.add(piecePosition.diff(position));
-                var secondNextPiece = board.getPieceOnPosition(secondNextPosition);
-
-                if (secondNextPiece.isPresent()) continue;
-
-                var otherJumpingMoves = getJumpingMoves(piece, secondNextPosition);
-
-                if (otherJumpingMoves.isEmpty()) {
-                    var move = new Move(
-                            new PieceMove(piece, secondNextPosition),
-                            new PieceMove(nextPiece));
-                    moves.add(move);
-                } else {
-                    for (var nextJumping : otherJumpingMoves) {
-                        var innerMoves = nextJumping.getMoves();
-                        innerMoves.add(new PieceMove(nextPiece));
-                        moves.add(new Move(innerMoves));
+                        while (nextPosition.isOnBoard() && !board.getPieceOnPosition(nextPosition).isPresent()) {
+                            jumpsOnly = true;
+                            jumps.add(new Move(true, PieceMove.Move(piece, nextPosition), PieceMove.Discard(nextPiece)));
+                            nextPosition = nextPosition.add(movement);
+                        }
                     }
                 }
             }
         }
 
-        return moves;
+        if (jumpsOnly)
+            return jumps;
+        else
+            return moves;
     }
 
     public Set<Move> getPossibleMovesForPiece(Piece piece) {
-        var moves = getJumpingMoves(piece, piece.getPosition());
+        if (piece.isQueen()) {
+            return getQueenPossibleMoves(piece);
+        }
 
-        if (!moves.isEmpty()) {
+        var jumpsOnly = false;
+        var moves = new HashSet<Move>();
+        var jumps = new HashSet<Move>();
+
+        var movements = new ArrayList<>(Arrays.asList(
+                new PositionDiff(0, -1),
+                new PositionDiff(0, 1)));
+
+        if (piece.getKind() == PieceKind.WHITE) {
+            movements.add(new PositionDiff(1, -1));
+            movements.add(new PositionDiff(1, 0));
+            movements.add(new PositionDiff(1, 1));
+        } else {
+            movements.add(new PositionDiff(-1, -1));
+            movements.add(new PositionDiff(-1, 0));
+            movements.add(new PositionDiff(-1, 1));
+        }
+
+        for (var movement : movements) {
+            var nextPosition = piece.getPosition().add(movement);
+
+            if (nextPosition.isOnBoard()) {
+                var nextPossiblePiece = board.getPieceOnPosition(nextPosition);
+                var secondNextPosition = nextPosition.add(movement);
+
+                if (secondNextPosition.isOnBoard()
+                        && !board.getPieceOnPosition(secondNextPosition).isPresent()
+                        && nextPossiblePiece.isPresent()
+                        && nextPossiblePiece.get().getKind() != piece.getKind()) {
+                    var move = new Move(
+                            true,
+                            PieceMove.Move(piece, secondNextPosition),
+                            PieceMove.Discard(nextPossiblePiece.get()));
+
+                    if (secondNextPosition.getRow() == ((piece.getKind() == PieceKind.BLACK) ? 0 : 8))
+                        move.addPieceMove(PieceMove.PromoteIntoQueen(piece));
+
+                    jumps.add(move);
+                    jumpsOnly = true;
+                } else if (!jumpsOnly && !board.getPieceOnPosition(nextPosition).isPresent()) {
+                    var move = new Move(PieceMove.Move(piece, nextPosition));
+                    if (nextPosition.getRow() == ((piece.getKind() == PieceKind.BLACK) ? 0 : 8))
+                        move.addPieceMove(PieceMove.PromoteIntoQueen(piece));
+
+                    moves.add(move);
+                }
+            }
+        }
+
+        if (jumps.isEmpty())
             return moves;
+        else
+            return jumps;
+    }
+
+    public Set<Move> getAllPossibleMoves(PieceKind player) {
+        var allMoves = new HashSet<Move>();
+
+        board.getPieces().stream().filter(piece -> piece.getKind() == player)
+                .forEach(piece -> allMoves.addAll(getPossibleMovesForPiece(piece)));
+
+        var moves = new HashSet<Move>();
+        var jumps = new HashSet<Move>();
+
+        for (var move : allMoves) {
+            if (move.isJumping())
+                jumps.add(move);
+            else
+                moves.add(move);
         }
 
-        for (var position : getPossibleMoves(piece, piece.getPosition())) {
-            if (!board.getPieceOnPosition(position).isPresent())
-                moves.add(new Move(new PieceMove(piece, position)));
-        }
-
-        return moves;
+        if (jumps.isEmpty())
+            return moves;
+        else
+            return jumps;
     }
 }

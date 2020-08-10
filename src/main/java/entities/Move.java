@@ -7,13 +7,34 @@ import java.util.Set;
 
 public class Move {
     final private Set<PieceMove> moves;
+    final private boolean isJumping;
 
     public Move(Set<PieceMove> moves) {
         this.moves = moves;
+        this.isJumping = false;
+    }
+
+    public Move(Set<PieceMove> moves, boolean isJumping) {
+        this.moves = moves;
+        this.isJumping = isJumping;
     }
 
     public Move(PieceMove... moves) {
         this.moves = new HashSet<>(Arrays.asList(moves));
+        this.isJumping = false;
+    }
+
+    public Move(boolean isJumping, PieceMove... moves) {
+        this.moves = new HashSet<>(Arrays.asList(moves));
+        this.isJumping = isJumping;
+    }
+
+    public boolean isJumping() {
+        return isJumping;
+    }
+
+    public void addPieceMove(PieceMove pieceMove) {
+        moves.add(pieceMove);
     }
 
     public Set<PieceMove> getMoves() {

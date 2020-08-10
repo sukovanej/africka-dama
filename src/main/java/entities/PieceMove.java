@@ -6,15 +6,24 @@ import java.util.Optional;
 public class PieceMove {
     private final Piece piece;
     private final Optional<Position> to;
+    private final PieceMoveKind moveKind;
 
-    public PieceMove(Piece piece, Position to) {
+    private PieceMove(Piece piece, Optional<Position> to, PieceMoveKind moveKind) {
         this.piece = piece;
-        this.to = Optional.of(to);
+        this.to = to;
+        this.moveKind = moveKind;
     }
 
-    public PieceMove(Piece piece) {
-        this.piece = piece;
-        this.to = Optional.empty();
+    public static PieceMove Move(Piece piece, Position to) {
+        return new PieceMove(piece, Optional.of(to), PieceMoveKind.MOVE);
+    }
+
+    public static PieceMove Discard(Piece piece) {
+        return new PieceMove(piece, Optional.empty(), PieceMoveKind.DISCARD);
+    }
+
+    public static PieceMove PromoteIntoQueen(Piece piece) {
+        return new PieceMove(piece, Optional.empty(), PieceMoveKind.PROMOTE_INTO_QUEEN);
     }
 
     public Piece getPiece() {
@@ -25,9 +34,18 @@ public class PieceMove {
         return to;
     }
 
+    public PieceMoveKind getMoveKind() {
+        return moveKind;
+    }
+
     @Override
     public String toString() {
-        return "PieceMove{piece=" + piece + ", to=" + to + "}";
+        if (moveKind == PieceMoveKind.MOVE)
+            return "(MOVE " + piece.getPosition() + " -> " + to.get() + ")";
+        else if (moveKind == PieceMoveKind.DISCARD)
+            return "(DISCARD " + piece.getPosition() + ")";
+        else
+            return "(PROMOTE " + piece.getPosition() + ")";
     }
 
     @Override

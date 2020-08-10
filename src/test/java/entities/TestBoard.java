@@ -14,7 +14,7 @@ public class TestBoard {
     @Test
     public void testPlayMove() {
         var board = BoardFactory.initializeBoard();
-        var move = new Move(new PieceMove(
+        var move = new Move(PieceMove.Move(
                 board.getPieceFromBoardPosition('f', 5).get(),
                 Position.fromBoardPosition('e', 5))
         );

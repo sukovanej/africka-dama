@@ -2,39 +2,40 @@ package ui;
 
 import entities.Board;
 
-import javafx.scene.Scene;
+import entities.Position;
+
+import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameBoardView {
-    private List<PaneView> paneViews;
-    private List<PieceView> pieceViews;
+    private final PaneView[][] paneViews;
+    private final List<PieceView> pieceViews;
+    private final Pane root;
+    private final Board board;
 
-    private Scene scene;
-    private Board board;
-
-    public GameBoardView(Scene scene, Board board) {
-        this.scene = scene;
+    public GameBoardView(Pane root, Board board) {
+        this.root = root;
         this.board = board;
 
         this.pieceViews = new ArrayList<>();
-        this.paneViews = new ArrayList<>();
+        this.paneViews = new PaneView[9][9];
     }
 
     public List<PieceView> getPieceViews() {
         return pieceViews;
     }
 
-    public List<PaneView> getPaneViews() {
-        return paneViews;
+    public PaneView getPaneView(int row, int column) {
+        return paneViews[row][column];
     }
 
     public void renderStart() {
         for (int row = 0; row < 9; row++) {
             for (int column = 0; column < 9; column++) {
-                var pane = new PaneView(scene, row, column);
-                this.paneViews.add(pane);
+                var pane = new PaneView(root, new Position(row, column));
+                paneViews[row][column] = pane;
                 pane.startRender();
             }
         }
@@ -43,11 +44,25 @@ public class GameBoardView {
             for (int column = 0; column < 9; column++) {
                 var possiblePiece = board.getBoard()[row][column];
                 if (possiblePiece.isPresent()) {
-                    var piece = new PieceView(scene, possiblePiece.get());
-                    this.pieceViews.add(piece);
+                    var piece = new PieceView(root, possiblePiece.get());
+                    pieceViews.add(piece);
                     piece.renderStart();
                 }
             }
         }
+    }
+
+    public void resetView() {
+        for (int row = 0; row < 9; row++)
+            for (int column = 0; column < 9; column++) {
+                paneViews[row][column].resetView();
+            }
+
+        for (var pieceView : pieceViews)
+            pieceView.resetView();
+    }
+
+    public Pane getRoot() {
+        return root;
     }
 }

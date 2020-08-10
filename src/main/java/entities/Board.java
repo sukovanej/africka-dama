@@ -7,9 +7,11 @@ import java.util.*;
 public class Board {
     public List<BoardListener> boardListeners;
 
-    private final Optional<Piece>[][] board; // TODO: add @NonNull annotation
+    protected final Optional<Piece>[][] board; // TODO: add @NonNull annotation
+    protected final Set<Piece> pieces;
 
     public Board(Set<Piece> pieces) {
+        this.pieces = pieces;
         boardListeners = new ArrayList<>();
         board = new Optional[9][9];
 
@@ -24,27 +26,32 @@ public class Board {
         }
     }
 
-    public void playMove(Move moveAggregate) {
-        for (var move : moveAggregate.getMoves()) {
+    public void playMove(Move moves) {
+        for (var move : moves.getMoves()) {
             var piece = move.getPiece();
             var piecePosition = move.getPiece().getPosition();
 
             board[piecePosition.getRow()][piecePosition.getColumn()] = Optional.empty();
 
-            move.getTo().ifPresentOrElse((position) -> {
+            if (move.getMoveKind() == PieceMoveKind.MOVE) {
+                var position = move.getTo().get();
                 board[position.getRow()][position.getColumn()] = Optional.of(move.getPiece());
                 piece.setPosition(position);
 
                 for (var listener : boardListeners) {
                     listener.pieceMoved(piece);
                 }
-            }, () -> {
+            } else if (move.getMoveKind() == PieceMoveKind.DISCARD) {
                 for (var listener : boardListeners) {
                     listener.pieceRemoved(piece);
+                    pieces.remove(piece);
                 }
-            });
-
-            // TODO: resolve promotion into queen
+            } else if (move.getMoveKind() == PieceMoveKind.PROMOTE_INTO_QUEEN) {
+                for (var listener : boardListeners) {
+                    listener.promoteIntoQueen(piece);
+                    piece.promoteIntoQueen();
+                }
+            }
         }
     }
 
@@ -63,5 +70,9 @@ public class Board {
 
     public void addBoardListerner(BoardListener listener) {
         boardListeners.add(listener);
+    }
+
+    public Set<Piece> getPieces() {
+        return pieces;
     }
 }

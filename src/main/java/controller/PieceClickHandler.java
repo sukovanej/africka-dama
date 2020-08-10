@@ -2,7 +2,7 @@ package controller;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import logic.PossibleMovesLogic;
+
 import ui.PieceView;
 
 public class PieceClickHandler implements EventHandler<MouseEvent> {
@@ -17,8 +17,9 @@ public class PieceClickHandler implements EventHandler<MouseEvent> {
     @Override
     public void handle(MouseEvent event) {
         if (state.isNone()) {
-            pieceView.highlight();
-            state.startMove(pieceView.getPiece());
+            state.startMove(pieceView);
+        } else {
+            state.reset();
         }
     }
 }

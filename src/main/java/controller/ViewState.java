@@ -1,9 +1,9 @@
 package controller;
 
-import entities.Piece;
+import entities.Position;
+import ui.PieceView;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 enum ViewStateEnum {
     NONE,
@@ -13,7 +13,9 @@ enum ViewStateEnum {
 public class ViewState {
     private ViewStateEnum state;
 
-    public Consumer<Piece> startMoveRunnable;
+    public Consumer<PieceView> startMoveCallable;
+    public Runnable resetViewCallable;
+    public Consumer<Position> makeMoveCallable;
 
     public ViewState() {
         state = ViewStateEnum.NONE;
@@ -23,8 +25,22 @@ public class ViewState {
         return state == ViewStateEnum.NONE;
     }
 
-    public void startMove(Piece piece) {
+    public boolean isStartMove() {
+        return state == ViewStateEnum.START_MOVE;
+    }
+
+    public void reset() {
+        resetViewCallable.run();
+        state = ViewStateEnum.NONE;
+    }
+
+    public void startMove(PieceView piece) {
         state = ViewStateEnum.START_MOVE;
-        startMoveRunnable.accept(piece);
+        startMoveCallable.accept(piece);
+    }
+
+    public void makeMove(Position position) {
+        state = ViewStateEnum.NONE;
+        makeMoveCallable.accept(position);
     }
 }

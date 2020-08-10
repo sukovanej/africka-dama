@@ -6,7 +6,7 @@ public class Position {
     private int row;
     private int column;
 
-    public Position(int column, int row) {
+    public Position(int row, int column) {
         this.column = column;
         this.row = row;
     }
@@ -27,8 +27,8 @@ public class Position {
         this.row = row;
     }
 
-    public static Position fromBoardPosition(char row, int column) {
-        return new Position(row - 'a', column - 1);
+    public static Position fromBoardPosition(char column, int row) {
+        return new Position( row - 1, column - 'a');
     }
 
     public PositionDiff diff(Position right) {
@@ -36,7 +36,7 @@ public class Position {
     }
 
     public Position add(PositionDiff diff) {
-        return new Position(diff.Column + getColumn(), diff.Row + getRow());
+        return new Position(diff.Row + getRow(), diff.Column + getColumn());
     }
 
     public void addInPlace(PositionDiff diff) {
@@ -45,12 +45,12 @@ public class Position {
     }
 
     public boolean isOnBoard() {
-        return getRow() >= 0 && getRow() <= 9 && getColumn() >= 0 && getColumn() <= 9;
+        return getRow() >= 0 && getRow() < 9 && getColumn() >= 0 && getColumn() < 9;
     }
 
     @Override
     public String toString() {
-        return "[" + (char) (column + 'a') + ", " + (int) (row + 1) + "]";
+        return "[" + (char) (getColumn() + 'a') + ", " + (int) (getRow() + 1) + "]";
     }
 
     @Override

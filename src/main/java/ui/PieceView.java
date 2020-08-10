@@ -2,28 +2,27 @@ package ui;
 
 import entities.Piece;
 import entities.PieceKind;
-import entities.Position;
 
 import javafx.scene.Group;
-import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 public class PieceView {
     final private Piece piece;
+    final private Pane root;
     final private Circle view;
-    final private Scene scene;
 
-    public PieceView (Scene scene, Piece piece) {
+    public PieceView (Pane root, Piece piece) {
         this.piece = piece;
-        this.scene = scene;
+        this.root = root;
+        this.view = new Circle();
 
-        this.view = createView();
+        initializeView();
     }
 
     public void renderStart() {
-        var group = (Group)scene.getRoot();
-        group.getChildren().add(view);
+        root.getChildren().add(view);
     }
 
     public Circle getView() {
@@ -34,32 +33,41 @@ public class PieceView {
         return piece;
     }
 
-    private void render() {
-        setViewPosition(this.view, this.piece.getPosition());
+    private void setViewPosition() {
+        var boxSize = root.getWidth() / 9;
+        view.setCenterX(boxSize / 2 + boxSize * piece.getPosition().getColumn());
+        view.setCenterY(boxSize / 2 + boxSize * (8 - piece.getPosition().getRow()));
     }
 
-    private void setViewPosition(Circle pieceView, Position position) {
-        var boxSize = scene.getWidth() / 9;
-        pieceView.setCenterX(boxSize / 2 + boxSize * position.getColumn());
-        pieceView.setCenterY(boxSize / 2 + boxSize * (8 - position.getRow()));
+    private void initializeView() {
+        var boxSize = root.getWidth() / 9;
+        var radius = boxSize * 0.7;
+
+        view.setRadius(radius / 2);
+        view.setStrokeWidth(5);
+
+        resetView();
+        setViewPosition();
     }
 
-    private Circle createView() {
-        var boxSize = scene.getWidth() / 9;
-        var radius = boxSize * 0.8;
+    public void resetView() {
+        if (piece.isQueen()) {
+            view.setFill((piece.getKind() == PieceKind.BLACK) ? Color.DARKGREEN : Color.LIGHTGREEN);
+        } else {
+            view.setFill((piece.getKind() == PieceKind.BLACK) ? Color.BLACK : Color.WHITE);
+        }
 
-        Circle pieceView = new Circle();
-        pieceView.setRadius(radius / 2);
-        pieceView.setFill((piece.getKind() == PieceKind.BLACK) ? Color.BLACK : Color.WHITE);
-        pieceView.setStroke((piece.getKind() == PieceKind.BLACK) ? Color.WHITE : Color.BLACK);
-        pieceView.setStrokeWidth(boxSize * 0.1);
+        view.setStroke((piece.getKind() == PieceKind.BLACK) ? Color.WHITE : Color.BLACK);
 
-        setViewPosition(pieceView, piece.getPosition());
-
-        return pieceView;
+        setViewPosition();
     }
 
     public void highlight() {
-        this.view.setStroke(Color.YELLOW);
+        view.setStroke(Color.DEEPPINK);
+        view.setFill(Color.LIGHTPINK);
+    }
+
+    public void remove() {
+        root.getChildren().remove(view);
     }
 }

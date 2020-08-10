@@ -8,4 +8,9 @@ public class PositionDiff {
         Row = row;
         Column = column;
     }
+
+    @Override
+    public String toString() {
+        return "Diff(" + Row + ", " + Column + ")";
+    }
 }

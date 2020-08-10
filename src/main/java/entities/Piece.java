@@ -1,14 +1,9 @@
 package entities;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class Piece {
     private Position position;
     private PieceKind kind;
     private boolean isQueen;
-
-    // queen support
 
     public Piece(Position position, PieceKind kind) {
         this.position = position;
@@ -26,7 +21,7 @@ public class Piece {
         return isQueen;
     }
 
-    public void makeQueen() {
+    public void promoteIntoQueen() {
         isQueen = true;
     }
 
