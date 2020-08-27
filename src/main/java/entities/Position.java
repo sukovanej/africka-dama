@@ -3,8 +3,8 @@ package entities;
 import java.util.Objects;
 
 public class Position {
-    private int row;
-    private int column;
+    private final int row;
+    private final int column;
 
     public Position(int row, int column) {
         this.column = column;
@@ -15,16 +15,8 @@ public class Position {
         return column;
     }
 
-    public void setColumn(int column) {
-        this.column = column;
-    }
-
     public int getRow() {
         return row;
-    }
-
-    public void setRow(int row) {
-        this.row = row;
     }
 
     public static Position fromBoardPosition(char column, int row) {
@@ -37,11 +29,6 @@ public class Position {
 
     public Position add(PositionDiff diff) {
         return new Position(diff.Row + getRow(), diff.Column + getColumn());
-    }
-
-    public void addInPlace(PositionDiff diff) {
-        setColumn(diff.Column + getColumn());
-        setRow(diff.Row + getRow());
     }
 
     public boolean isOnBoard() {
@@ -58,7 +45,7 @@ public class Position {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Position position = (Position) o;
-        return row == position.row && column == position.column;
+        return row == position.getRow() && column == position.getColumn();
     }
 
     @Override

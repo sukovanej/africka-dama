@@ -5,11 +5,13 @@ import java.util.Optional;
 
 public class PieceMove {
     private final Piece piece;
+    private final Position from;
     private final Optional<Position> to;
     private final PieceMoveKind moveKind;
 
     private PieceMove(Piece piece, Optional<Position> to, PieceMoveKind moveKind) {
         this.piece = piece;
+        this.from = piece.getPosition();
         this.to = to;
         this.moveKind = moveKind;
     }
@@ -41,7 +43,7 @@ public class PieceMove {
     @Override
     public String toString() {
         if (moveKind == PieceMoveKind.MOVE)
-            return "(MOVE " + piece.getPosition() + " -> " + to.get() + ")";
+            return "(MOVE " + from + " -> " + to.get() + ")";
         else if (moveKind == PieceMoveKind.DISCARD)
             return "(DISCARD " + piece.getPosition() + ")";
         else
@@ -59,5 +61,9 @@ public class PieceMove {
     @Override
     public int hashCode() {
         return Objects.hash(piece, to);
+    }
+
+    public Position getFrom() {
+        return from;
     }
 }

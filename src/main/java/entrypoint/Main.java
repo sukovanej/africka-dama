@@ -1,8 +1,7 @@
 package entrypoint;
 
-import controller.PlayerPlayerController;
+import controller.GameController;
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -16,11 +15,16 @@ public class Main extends Application {
         Scene scene = new Scene(root ,700, 700);
         scene.setFill(Color.WHITE);
 
-        new PlayerPlayerController(root).start();
+        var controller = new GameController(root);
+        controller.start();
 
         primaryStage.setTitle("Dama");
         primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
+
+        primaryStage.widthProperty().addListener((x, y, z) -> { controller.state.resetViewCallable.run(); });
+        primaryStage.heightProperty().addListener((x, y, z) -> { controller.state.resetViewCallable.run(); });
+
         primaryStage.show();
     }
 

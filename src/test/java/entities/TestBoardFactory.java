@@ -27,11 +27,9 @@ public class TestBoardFactory {
     public void testInitializeBoard() {
         var board = BoardFactory.initializeBoard();
 
-        var boardPieces = board.getBoard();
-
         for (int row = 0; row < 9; row++)
             for (int column = 0; column < 9; column++) {
-                var optionalPieces = boardPieces[row][column];
+                var optionalPieces = board.getPieceOnPosition(row, column);
 
                 if (row > 4 || row == 4 && column < 4) {
                     assertTrue(optionalPieces.isPresent());

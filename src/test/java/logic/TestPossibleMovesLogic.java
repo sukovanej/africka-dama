@@ -7,7 +7,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -213,5 +212,39 @@ public class TestPossibleMovesLogic {
                 PieceMove.Discard(board.getPieceFromBoardPosition('e', 5).get()));
         expected = new HashSet<>(Collections.singletonList(move));
         assertEquals(expected, possibleMoves);
+    }
+
+    @Test
+    public void testStartOfTheGame() {
+        var board = BoardFactory.initializeBoard();
+        var logic = new PossibleMovesLogic(board);
+
+        var possibleMoves = logic.getAllPossibleMoves(PieceKind.WHITE);
+        assertEquals(possibleMoves.size(), 4);
+        System.out.println(board);
+
+
+        board.playMove(
+                new Move(
+                        PieceMove.Move(
+                                board.getPieceFromBoardPosition('e', 4).get(),
+                                Position.fromBoardPosition('e', 5))));
+        System.out.println(board);
+
+        possibleMoves = logic.getAllPossibleMoves(PieceKind.BLACK);
+        assertEquals(possibleMoves.size(), 2);
+
+        var move = new Move(
+                PieceMove.Move(
+                        board.getPieceFromBoardPosition('e', 6).get(),
+                        Position.fromBoardPosition('e', 4)),
+                PieceMove.Discard(
+                        board.getPieceFromBoardPosition('e', 5).get()));
+        board.playMove(move);
+
+        System.out.println(board);
+
+        possibleMoves = logic.getAllPossibleMoves(PieceKind.WHITE);
+        assertEquals(possibleMoves.size(), 2);
     }
 }

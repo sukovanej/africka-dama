@@ -23,18 +23,17 @@ public class PaneView {
     }
 
     private void initializeView() {
-        var size = root.getWidth() / 9;
+        resetView();
+    }
+
+    public void resetView() {
+        var size = Math.min(root.getWidth() / 9, root.getHeight() / 9);
 
         pane.setX(size * (position.getColumn()));
         pane.setY(size * (8 - position.getRow()));
         pane.setWidth(size);
         pane.setHeight(size);
         pane.setStrokeWidth(1);
-
-        resetView();
-    }
-
-    public void resetView() {
         pane.setFill(((position.getRow() + position.getColumn()) % 2 == 0) ? Color.DARKGRAY : Color.BROWN);
         pane.setStroke(Color.BLACK);
     }

@@ -2,8 +2,6 @@ package ui;
 
 import entities.Piece;
 import entities.PieceKind;
-
-import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -34,23 +32,23 @@ public class PieceView {
     }
 
     private void setViewPosition() {
-        var boxSize = root.getWidth() / 9;
+        var boxSize = Math.min(root.getWidth() / 9, root.getHeight() / 9);
         view.setCenterX(boxSize / 2 + boxSize * piece.getPosition().getColumn());
         view.setCenterY(boxSize / 2 + boxSize * (8 - piece.getPosition().getRow()));
     }
 
     private void initializeView() {
-        var boxSize = root.getWidth() / 9;
-        var radius = boxSize * 0.7;
-
-        view.setRadius(radius / 2);
-        view.setStrokeWidth(5);
-
         resetView();
         setViewPosition();
     }
 
     public void resetView() {
+        var boxSize = Math.min(root.getWidth() / 9, root.getHeight() / 9);
+        var radius = boxSize * 0.7;
+
+        view.setRadius(radius / 2);
+        view.setStrokeWidth(radius * 0.1);
+
         if (piece.isQueen()) {
             view.setFill((piece.getKind() == PieceKind.BLACK) ? Color.DARKGREEN : Color.LIGHTGREEN);
         } else {

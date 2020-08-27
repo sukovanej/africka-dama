@@ -3,7 +3,6 @@ package controller;
 import entities.Position;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import ui.PieceView;
 
 public class PaneClickHandler implements EventHandler<MouseEvent> {
     private final ViewState state;
@@ -18,10 +17,7 @@ public class PaneClickHandler implements EventHandler<MouseEvent> {
     public void handle(MouseEvent event) {
         if (state.isStartMove()) {
             state.makeMove(position);
-            state.reset();
-        } else {
-            System.out.println(position);
-            state.reset();
         }
+        state.reset();
     }
 }

@@ -40,15 +40,10 @@ public class GameBoardView {
             }
         }
 
-        for (int row = 0; row < 9; row++) {
-            for (int column = 0; column < 9; column++) {
-                var possiblePiece = board.getBoard()[row][column];
-                if (possiblePiece.isPresent()) {
-                    var piece = new PieceView(root, possiblePiece.get());
-                    pieceViews.add(piece);
-                    piece.renderStart();
-                }
-            }
+        for (var piece : board.getPieces()) {
+            var pieceView = new PieceView(root, piece);
+            pieceViews.add(pieceView);
+            pieceView.renderStart();
         }
     }
 

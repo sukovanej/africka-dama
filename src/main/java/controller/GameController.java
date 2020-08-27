@@ -1,8 +1,9 @@
 package controller;
 
+import computer.CloneableBoard;
+import computer.BestMoveLogic;
 import entities.*;
 import factories.BoardFactory;
-import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import logic.EndGameLogic;
 import logic.PossibleMovesLogic;
@@ -12,19 +13,23 @@ import ui.PieceView;
 
 import java.util.Set;
 
-public class PlayerPlayerController {
+public class GameController {
     private final Board board;
     private final PossibleMovesLogic logic;
     private final GameBoardView view;
-    private final ViewState state;
     private final EndGameLogic endGameLogic;
+
+    private boolean isWhiteComputer = false;
+    private boolean isBlackComputer = true;
+    private int depth = 6;
 
     private PieceKind currentPlayer;
     private Piece selectedPiece;
-
     private Set<Move> possibleMoves;
 
-    public PlayerPlayerController(Pane root) {
+    public final ViewState state;
+
+    public GameController(Pane root) {
         board = BoardFactory.initializeBoard();
         logic = new PossibleMovesLogic(board);
         endGameLogic = new EndGameLogic(board);
@@ -33,7 +38,7 @@ public class PlayerPlayerController {
         currentPlayer = PieceKind.WHITE;
         possibleMoves = logic.getAllPossibleMoves(currentPlayer);
 
-        board.addBoardListerner(new BoardListener(view));
+        board.addBoardListener(new BoardListener(view));
 
         state = new ViewState();
         state.startMoveCallable = this::startMove;
@@ -126,5 +131,27 @@ public class PlayerPlayerController {
                     }
                 }
             }
+    }
+
+    private void playComputerMove() {
+        var bestMove = BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), depth, currentPlayer);
+
+        for (var move: bestMove.getMoves()) {
+            if (move.getMoveKind() == PieceMoveKind.MOVE) {
+                PieceView pieceView = null;
+
+                for (var _pieceView: view.getPieceViews()) {
+                    if (_pieceView.getPiece().getPosition().equals(move.getFrom()))
+                        pieceView = _pieceView;
+                }
+
+                new PieceClickHandler(state, pieceView).handle(null);
+                new PaneClickHandler(state, move.getTo().get()).handle(null);
+            }
+        }
+    }
+
+    private boolean isCurrentPlayerComputer() {
+        return currentPlayer == PieceKind.WHITE && isWhiteComputer || currentPlayer == PieceKind.BLACK && isBlackComputer;
     }
 }

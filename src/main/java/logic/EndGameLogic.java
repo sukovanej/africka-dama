@@ -14,7 +14,7 @@ public class EndGameLogic implements BoardListener {
     public EndGameLogic(Board board) {
         this.board = board;
         movesWithoutJump = 0;
-        board.addBoardListerner(this);
+        board.addBoardListener(this);
     }
 
     @Override
