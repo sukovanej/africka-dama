@@ -11,21 +11,13 @@ public class TestBestMoveLogic {
     public void TestBestMoveLogicTheGameStartWhitePlayer() {
         var board = BoardFactory.initializeBoard();
 
-        BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), 15, PieceKind.WHITE);
+        BestMoveLogic.getBestMove(board, 1, PieceKind.WHITE);
+        BestMoveLogic.getBestMove(board, 2, PieceKind.WHITE);
+        BestMoveLogic.getBestMove(board, 3, PieceKind.WHITE);
+        BestMoveLogic.getBestMove(board, 4, PieceKind.WHITE);
+        BestMoveLogic.getBestMove(board, 5, PieceKind.WHITE);
 
-        BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), 1, PieceKind.WHITE);
-        assertEquals(board.getPieces().size(), 80);
-
-        BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), 2, PieceKind.WHITE);
-        assertEquals(board.getPieces().size(), 80);
-
-        BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), 3, PieceKind.WHITE);
-        assertEquals(board.getPieces().size(), 80);
-
-        BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), 4, PieceKind.WHITE);
-        assertEquals(board.getPieces().size(), 80);
-
-        BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), 5, PieceKind.WHITE);
+        // check that the logic didn't break the original board
         assertEquals(board.getPieces().size(), 80);
     }
 

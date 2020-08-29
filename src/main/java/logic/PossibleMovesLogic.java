@@ -107,14 +107,14 @@ public class PossibleMovesLogic {
                             PieceMove.Discard(nextPossiblePiece.get()));
 
                     if (secondNextPosition.getRow() == ((piece.getKind() == PieceKind.BLACK) ? 0 : 8))
-                        move.addPieceMove(PieceMove.PromoteIntoQueen(secondNextPosition));
+                        move.addPieceMove(PieceMove.PromoteIntoQueen(piece));
 
                     jumps.add(move);
                     jumpsOnly = true;
                 } else if (!jumpsOnly && !board.getPieceOnPosition(nextPosition).isPresent()) {
                     var move = new Move(PieceMove.Move(piece, nextPosition));
                     if (nextPosition.getRow() == ((piece.getKind() == PieceKind.BLACK) ? 0 : 8))
-                        move.addPieceMove(PieceMove.PromoteIntoQueen(nextPosition));
+                        move.addPieceMove(PieceMove.PromoteIntoQueen(piece));
 
                     moves.add(move);
                 }

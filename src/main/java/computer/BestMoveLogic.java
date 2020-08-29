@@ -1,5 +1,6 @@
 package computer;
 
+import entities.Board;
 import entities.Move;
 import entities.PieceKind;
 import logic.EndGameLogic;
@@ -8,11 +9,10 @@ import logic.PossibleMovesLogic;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BestMoveLogic {
-    public static Move getBestMove(CloneableBoard board, int depth, PieceKind player) {
+    public static Move getBestMove(Board board, int depth, PieceKind player) {
         var numberOfNodes = new AtomicInteger(0);
 
-        var newBoard = board.copy();
-        var logic = new PossibleMovesLogic(newBoard);
+        var logic = new PossibleMovesLogic(board);
         var possibleMoves = logic.getAllPossibleMoves(player);
 
         var bestScore = player == PieceKind.WHITE ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
@@ -21,10 +21,10 @@ public class BestMoveLogic {
         var beta = Float.POSITIVE_INFINITY;
 
         for (Move move : possibleMoves) {
-            newBoard.playMove(move);
+            board.playMove(move);
 
             var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
-            var newScore = getBestMove(newBoard, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
+            var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player)) {
                 bestScore = newScore;
@@ -37,10 +37,10 @@ public class BestMoveLogic {
                 beta = Math.min(beta, bestScore);
             }
 
+            board.undoMove(move);
+
             if (alpha >= beta)
                 break;
-
-            newBoard = board.copy();
         }
 
         System.out.println("number of nodes: " + numberOfNodes.get());
@@ -48,7 +48,7 @@ public class BestMoveLogic {
     }
 
     private static float getBestMove(
-            CloneableBoard board,
+            Board board,
             float alpha,
             float beta,
             int depth,
@@ -67,17 +67,16 @@ public class BestMoveLogic {
             return calculateScore(board, player);
         }
 
-        var newBoard = board.copy();
-        var logic = new PossibleMovesLogic(newBoard);
+        var logic = new PossibleMovesLogic(board);
         var possibleMoves = logic.getAllPossibleMoves(player);
         var bestScore = player == PieceKind.WHITE ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
 
         for (Move move : possibleMoves) {
-            newBoard.playMove(move);
+            board.playMove(move);
             numberOfNodes.incrementAndGet();
 
             var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
-            var newScore = getBestMove(newBoard, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
+            var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player))
                 bestScore = newScore;
@@ -88,16 +87,16 @@ public class BestMoveLogic {
                 beta = Math.min(beta, bestScore);
             }
 
+            board.undoMove(move);
+
             if (alpha >= beta)
                 break;
-
-            newBoard = board.copy();
         }
 
         return bestScore;
     }
 
-    private static float calculateScore(CloneableBoard board, PieceKind player) {
+    private static float calculateScore(Board board, PieceKind player) {
         float result = 0;
         for (var piece : board.getPieces()) {
             float pieceValue = piece.isQueen() ? 10 : 1;

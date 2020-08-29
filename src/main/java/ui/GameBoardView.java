@@ -53,8 +53,18 @@ public class GameBoardView {
                 paneViews[row][column].resetView();
             }
 
-        for (var pieceView : pieceViews)
-            pieceView.resetView();
+        for (var pieceView : pieceViews) {
+            var piece = pieceView.getPiece();
+            var discardedPieces = board.getDiscardedPieces();
+            var pieces = board.getPieces();
+
+            if (pieces.contains(piece) && !pieceView.isVisible())
+                pieceView.add();
+            else if (discardedPieces.contains(piece) && pieceView.isVisible())
+                pieceView.remove();
+            else
+                pieceView.resetView();
+        }
     }
 
     public Pane getRoot() {

@@ -25,13 +25,13 @@ public class TestPossibleMovesLogicWithQueen {
                 new Move(PieceMove.Move(testingPiece, Position.fromBoardPosition('d', 8))),
                 new Move(
                         PieceMove.Move(testingPiece, Position.fromBoardPosition('d', 9)),
-                        PieceMove.PromoteIntoQueen(Position.fromBoardPosition('d', 9))),
+                        PieceMove.PromoteIntoQueen(testingPiece)),
                 new Move(
                         PieceMove.Move(testingPiece, Position.fromBoardPosition('e', 9)),
-                        PieceMove.PromoteIntoQueen(Position.fromBoardPosition('e', 9))),
+                        PieceMove.PromoteIntoQueen(testingPiece)),
                 new Move(
                         PieceMove.Move(testingPiece, Position.fromBoardPosition('f', 9)),
-                        PieceMove.PromoteIntoQueen(Position.fromBoardPosition('f', 9)))));
+                        PieceMove.PromoteIntoQueen(testingPiece))));
 
         assertEquals(expected, logic.getPossibleMovesForPiece(testingPiece));
     }

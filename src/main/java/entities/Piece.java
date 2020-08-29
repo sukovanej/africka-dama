@@ -25,6 +25,10 @@ public class Piece {
         isQueen = true;
     }
 
+    public void queenToPiece() {
+        isQueen = false;
+    }
+
     public PieceKind getKind() {
         return kind;
     }
@@ -63,5 +67,9 @@ public class Piece {
     @Override
     public int hashCode() {
         return System.identityHashCode(this);
+    }
+
+    public void unpromote() {
+        isQueen = false;
     }
 }

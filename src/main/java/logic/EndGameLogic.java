@@ -1,35 +1,17 @@
 package logic;
 
 import entities.Board;
-import entities.Piece;
 import entities.PieceKind;
-import event.BoardListener;
 
 import java.util.Optional;
 
-public class EndGameLogic implements BoardListener {
+public class EndGameLogic {
     private Integer movesWithoutJump;
     private final Board board;
 
     public EndGameLogic(Board board) {
         this.board = board;
         movesWithoutJump = 0;
-        board.addBoardListener(this);
-    }
-
-    @Override
-    public void pieceMoved(Piece piece) {
-        movesWithoutJump++;
-    }
-
-    @Override
-    public void pieceRemoved(Piece piece) {
-        movesWithoutJump = 0;
-    }
-
-    @Override
-    public void promoteIntoQueen(Piece piece) {
-        movesWithoutJump++;
     }
 
     private boolean isDraw() {

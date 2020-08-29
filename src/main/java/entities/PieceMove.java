@@ -4,19 +4,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class PieceMove {
+    private final Piece piece;
     private final Position position;
     private final Optional<Position> newPosition;
     private final PieceMoveKind moveKind;
 
     private PieceMove(Piece piece, Optional<Position> newPosition, PieceMoveKind moveKind) {
+        this.piece = piece;
         this.position = piece.getPosition();
         this.newPosition = newPosition;
-        this.moveKind = moveKind;
-    }
-
-    private PieceMove(Position position, PieceMoveKind moveKind) {
-        this.position = position;
-        this.newPosition = Optional.empty();
         this.moveKind = moveKind;
     }
 
@@ -28,8 +24,8 @@ public class PieceMove {
         return new PieceMove(piece, Optional.empty(), PieceMoveKind.DISCARD);
     }
 
-    public static PieceMove PromoteIntoQueen(Position position) {
-        return new PieceMove(position, PieceMoveKind.PROMOTE_INTO_QUEEN);
+    public static PieceMove PromoteIntoQueen(Piece piece) {
+        return new PieceMove(piece, Optional.empty(), PieceMoveKind.PROMOTE_INTO_QUEEN);
     }
 
     public Optional<Position> getNewPosition() {
@@ -65,5 +61,9 @@ public class PieceMove {
 
     public Position getPosition() {
         return position;
+    }
+
+    public Piece getPiece() {
+        return piece;
     }
 }

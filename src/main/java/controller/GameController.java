@@ -1,7 +1,6 @@
 package controller;
 
 import computer.BestMoveLogic;
-import computer.CloneableBoard;
 import entities.*;
 import factories.BoardFactory;
 import javafx.application.Platform;
@@ -19,9 +18,10 @@ public class GameController {
     private final PossibleMovesLogic logic;
     private final GameBoardView view;
     private final EndGameLogic endGameLogic;
+    private final BoardHistory boardHistory;
 
-    private boolean isWhiteComputer = true;
-    private boolean isBlackComputer = true;
+    private boolean isWhiteComputer = false;
+    private boolean isBlackComputer = false;
     private int depth = 5;
 
     private PieceKind currentPlayer;
@@ -35,11 +35,10 @@ public class GameController {
         logic = new PossibleMovesLogic(board);
         endGameLogic = new EndGameLogic(board);
         view = new GameBoardView(root, board);
+        boardHistory = new BoardHistory(board);
 
         currentPlayer = PieceKind.WHITE;
         possibleMoves = logic.getAllPossibleMoves(currentPlayer);
-
-        board.addBoardListener(new BoardListener(view));
 
         state = new ViewState();
         state.startMoveCallable = this::startMove;
@@ -67,7 +66,6 @@ public class GameController {
     }
 
     private void startMove(PieceView pieceView) {
-        System.out.println("move started");
         selectedPiece = pieceView.getPiece();
         var piece = pieceView.getPiece();
 
@@ -96,8 +94,8 @@ public class GameController {
             var possibleJumpingMove = possibleMovesPreviousPiece.stream().filter(Move::isJumping).findAny();
 
             if (possibleJumpingMove.isPresent()) {
-                System.out.println("Must continue");
                 possibleMoves = possibleMovesPreviousPiece;
+                System.out.println("[Continuing jumping] New possible moves = " + possibleMoves);
 
                 if (isCurrentPlayerComputer())
                     playComputerMove();
@@ -106,8 +104,9 @@ public class GameController {
             }
         }
 
-        currentPlayer = (currentPlayer == PieceKind.BLACK) ? PieceKind.WHITE : PieceKind.BLACK;
+        currentPlayer = currentPlayer == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
         possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+        System.out.println("[New move] New possible moves = " + possibleMoves);
 
         if (isCurrentPlayerComputer())
             playComputerMove();
@@ -130,14 +129,13 @@ public class GameController {
     }
 
     private void makeMove(Position position) {
-        System.out.println("move made");
         for (var move : possibleMoves)
             for (var pieceMove : move.getMoves()) {
                 if (pieceMove.getMoveKind() == PieceMoveKind.MOVE
                         && pieceMove.getNewPosition().get().equals(position)
-                        && pieceMove.getPosition() == selectedPiece.getPosition()) {
-                    System.out.println("actually made move");
+                        && pieceMove.getPosition().equals(selectedPiece.getPosition())) {
                     board.playMove(move);
+                    boardHistory.movePlayed(move);
 
                     if (endGameLogic.isEndOfGame()) {
                         var dialog = new EndGameDialog(endGameLogic.getWinningPlayer(), view.getRoot());
@@ -149,7 +147,9 @@ public class GameController {
                 }
             }
 
-        System.out.println("didn't do a move, position = " + position + ", possible moves = " + possibleMoves);
+        System.out.println("didn't do a move, selected piece = " + selectedPiece +
+                ", position = " + position +
+                ", possible moves = " + possibleMoves);
     }
 
     private void sleep(int ms) {
@@ -163,8 +163,7 @@ public class GameController {
     private void playComputerMove() {
         new Thread(() -> {
             state.startComputerMove();
-            System.out.println("Computer move...");
-            var bestMove = BestMoveLogic.getBestMove(CloneableBoard.fromBoard(board), depth, currentPlayer);
+            var bestMove = BestMoveLogic.getBestMove(board, depth, currentPlayer);
 
             for (var move : bestMove.getMoves()) {
                 if (move.getMoveKind() == PieceMoveKind.MOVE) {
@@ -186,12 +185,31 @@ public class GameController {
                     System.out.println("[confirm] Computer clicked on " + move.getNewPosition().toString());
                 }
             }
-            System.out.println("Computer finished");
             state.stopComputerMove();
         }).start();
     }
 
     private boolean isCurrentPlayerComputer() {
         return currentPlayer == PieceKind.WHITE && isWhiteComputer || currentPlayer == PieceKind.BLACK && isBlackComputer;
+    }
+
+    public void historyNext() {
+        System.out.println("History: next");
+        boardHistory.next();
+
+        currentPlayer = boardHistory.getCurrentPlayer();
+        possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+
+        state.reset();
+    }
+
+    public void historyPrevious() {
+        System.out.println("History: previous");
+        boardHistory.previous();
+
+        currentPlayer = boardHistory.getCurrentPlayer();
+        possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+
+        state.reset();
     }
 }

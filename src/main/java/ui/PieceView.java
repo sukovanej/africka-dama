@@ -12,10 +12,13 @@ public class PieceView {
     final private Pane root;
     final private Circle view;
 
+    private boolean visible;
+
     public PieceView (Pane root, Piece piece) {
         this.piece = piece;
         this.root = root;
         this.view = new Circle();
+        this.visible = true;
 
         initializeView();
     }
@@ -67,6 +70,24 @@ public class PieceView {
     }
 
     public void remove() {
-        Platform.runLater(() -> root.getChildren().remove(view));
+        visible = false;
+
+        Platform.runLater(() -> {
+            root.getChildren().remove(view);
+            resetView();
+        });
+    }
+
+    public void add() {
+        visible = true;
+
+        Platform.runLater(() -> {
+            root.getChildren().add(view);
+            resetView();
+        });
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 }

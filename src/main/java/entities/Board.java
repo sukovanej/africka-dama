@@ -1,61 +1,39 @@
 package entities;
 
-import event.BoardListener;
-
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class Board {
-    public List<BoardListener> boardListeners;
-
     protected final Set<Piece> pieces;
+    protected final Set<Piece> discardedPieces;
 
     public Board(Set<Piece> pieces) {
         this.pieces = pieces;
-        boardListeners = new ArrayList<>();
+        this.discardedPieces = new HashSet<>();
     }
 
     public void playMove(Move moves) throws UnknownError {
-        var sortedMoves = new ArrayList<>(moves.getMoves());
-
-        // do movements first, then discards and promotions
-        sortedMoves.sort((left, right) -> {
-            if (left.getMoveKind() == PieceMoveKind.MOVE)
-                return -1;
-            else if (right.getMoveKind() == PieceMoveKind.MOVE)
-                return 1;
-            return 0;
-        });
-
-        for (var move : sortedMoves) {
-            var optPiece = getPieceOnPosition(move.getPosition());
-
-            if (optPiece.isEmpty())
-                throw new UnknownError();
-
-            var piece = optPiece.get();
+        for (var move : moves.getMoves()) {
+            var piece = move.getPiece();
 
             if (move.getMoveKind() == PieceMoveKind.MOVE) {
                 var position = move.getNewPosition().get();
                 piece.setPosition(position);
-
-                for (var listener : boardListeners) {
-                    listener.pieceMoved(piece);
-                }
             } else if (move.getMoveKind() == PieceMoveKind.DISCARD) {
-                for (var listener : boardListeners) {
-                    listener.pieceRemoved(piece);
-                }
+                var previousPieces = pieces.size();
+                var previousDiscardedPieces = discardedPieces.size();
 
-                var previous = pieces.size();
                 pieces.remove(piece);
+                discardedPieces.add(piece);
+
                 // piece removal check
-                if (pieces.size() + 1 != previous) {
+                if (pieces.size() + 1 != previousPieces)
                     throw new UnknownError();
-                }
+                else if (discardedPieces.size() - 1 != previousDiscardedPieces)
+                    throw new UnknownError();
+
             } else if (move.getMoveKind() == PieceMoveKind.PROMOTE_INTO_QUEEN) {
-                for (var listener : boardListeners) {
-                    listener.promoteIntoQueen(piece);
-                }
                 piece.promoteIntoQueen();
             }
         }
@@ -74,10 +52,6 @@ public class Board {
 
     public Optional<Piece> getPieceOnPosition(int row, int column) {
         return getPieceOnPosition(new Position(row, column));
-    }
-
-    public void addBoardListener(BoardListener listener) {
-        boardListeners.add(listener);
     }
 
     public Set<Piece> getPieces() {
@@ -110,5 +84,35 @@ public class Board {
         }
 
         return result;
+    }
+
+    public void undoMove(Move moves) {
+        for (var move : moves.getMoves()) {
+            var piece = move.getPiece();
+
+            if (move.getMoveKind() == PieceMoveKind.MOVE) {
+                var position = move.getPosition();
+                piece.setPosition(position);
+            } else if (move.getMoveKind() == PieceMoveKind.DISCARD) {
+                var previousPieces = pieces.size();
+                var previousDiscardedPieces = discardedPieces.size();
+
+                pieces.add(piece);
+                discardedPieces.remove(piece);
+
+                // piece return check
+                if (pieces.size() - 1 != previousPieces)
+                    throw new UnknownError();
+                else if (discardedPieces.size() + 1 != previousDiscardedPieces)
+                    throw new UnknownError();
+
+            } else if (move.getMoveKind() == PieceMoveKind.PROMOTE_INTO_QUEEN) {
+                piece.unpromote();
+            }
+        }
+    }
+
+    public Set<Piece> getDiscardedPieces() {
+        return discardedPieces;
     }
 }
