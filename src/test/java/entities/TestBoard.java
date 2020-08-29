@@ -1,13 +1,9 @@
 package entities;
 
 import factories.BoardFactory;
-import logic.PossibleMovesLogic;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TestBoard {
@@ -23,7 +19,26 @@ public class TestBoard {
 
         board.playMove(move);
 
-        assertTrue(!board.getPieceFromBoardPosition('f', 5).isPresent());
+        assertFalse(board.getPieceFromBoardPosition('f', 5).isPresent());
         assertTrue(board.getPieceFromBoardPosition('e', 5).isPresent());
+    }
+
+    @Test
+    public void testPlayMoveDiscard() {
+        var board = BoardFactory.initializeBoard();
+
+        assertTrue(board.getPieceFromBoardPosition('e', 6).isPresent());
+        assertTrue(board.getPieceFromBoardPosition('e', 4).isPresent());
+
+        var move = new Move(
+                PieceMove.Move(
+                        board.getPieceFromBoardPosition('e', 6).get(),
+                        Position.fromBoardPosition('e', 4)),
+                PieceMove.Discard(board.getPieceFromBoardPosition('e', 4).get()));
+        board.playMove(move);
+
+        assertTrue(board.getPieceFromBoardPosition('e', 6).isEmpty());
+        assertTrue(board.getPieceFromBoardPosition('e', 5).isEmpty());
+        assertTrue(board.getPieceFromBoardPosition('e', 4).isPresent());
     }
 }

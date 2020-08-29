@@ -12,6 +12,7 @@ enum ViewStateEnum {
 
 public class ViewState {
     private ViewStateEnum state;
+    private boolean isComputerPlaying;
 
     public Consumer<PieceView> startMoveCallable;
     public Runnable resetViewCallable;
@@ -19,6 +20,7 @@ public class ViewState {
 
     public ViewState() {
         state = ViewStateEnum.NONE;
+        isComputerPlaying = false;
     }
 
     public boolean isNone() {
@@ -27,6 +29,10 @@ public class ViewState {
 
     public boolean isStartMove() {
         return state == ViewStateEnum.START_MOVE;
+    }
+
+    public boolean isComputerPlaying() {
+        return isComputerPlaying;
     }
 
     public void reset() {
@@ -42,5 +48,13 @@ public class ViewState {
     public void makeMove(Position position) {
         state = ViewStateEnum.NONE;
         makeMoveCallable.accept(position);
+    }
+
+    public void startComputerMove() {
+        isComputerPlaying = true;
+    }
+
+    public void stopComputerMove() {
+        isComputerPlaying = false;
     }
 }

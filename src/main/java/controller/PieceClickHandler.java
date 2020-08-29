@@ -16,6 +16,9 @@ public class PieceClickHandler implements EventHandler<MouseEvent> {
 
     @Override
     public void handle(MouseEvent event) {
+        if (state.isComputerPlaying())
+            return;
+
         if (state.isNone()) {
             state.startMove(pieceView);
         } else {

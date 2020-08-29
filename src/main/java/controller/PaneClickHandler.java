@@ -18,6 +18,7 @@ public class PaneClickHandler implements EventHandler<MouseEvent> {
         if (state.isStartMove()) {
             state.makeMove(position);
         }
+
         state.reset();
     }
 }

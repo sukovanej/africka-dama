@@ -1,7 +1,5 @@
 package entities;
 
-import java.util.Objects;
-
 public class Piece {
     private Position position;
     private PieceKind kind;
@@ -57,13 +55,13 @@ public class Piece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Piece piece = (Piece) o;
-        return isQueen == piece.isQueen &&
-                Objects.equals(position, piece.position) &&
+        return isQueen == piece.isQueen() &&
+                position.equals(piece.getPosition()) &&
                 kind == piece.kind;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(position, kind, isQueen);
+        return System.identityHashCode(this);
     }
 }

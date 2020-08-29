@@ -4,15 +4,19 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class PieceMove {
-    private final Piece piece;
-    private final Position from;
-    private final Optional<Position> to;
+    private final Position position;
+    private final Optional<Position> newPosition;
     private final PieceMoveKind moveKind;
 
-    private PieceMove(Piece piece, Optional<Position> to, PieceMoveKind moveKind) {
-        this.piece = piece;
-        this.from = piece.getPosition();
-        this.to = to;
+    private PieceMove(Piece piece, Optional<Position> newPosition, PieceMoveKind moveKind) {
+        this.position = piece.getPosition();
+        this.newPosition = newPosition;
+        this.moveKind = moveKind;
+    }
+
+    private PieceMove(Position position, PieceMoveKind moveKind) {
+        this.position = position;
+        this.newPosition = Optional.empty();
         this.moveKind = moveKind;
     }
 
@@ -24,16 +28,12 @@ public class PieceMove {
         return new PieceMove(piece, Optional.empty(), PieceMoveKind.DISCARD);
     }
 
-    public static PieceMove PromoteIntoQueen(Piece piece) {
-        return new PieceMove(piece, Optional.empty(), PieceMoveKind.PROMOTE_INTO_QUEEN);
+    public static PieceMove PromoteIntoQueen(Position position) {
+        return new PieceMove(position, PieceMoveKind.PROMOTE_INTO_QUEEN);
     }
 
-    public Piece getPiece() {
-        return piece;
-    }
-
-    public Optional<Position> getTo() {
-        return to;
+    public Optional<Position> getNewPosition() {
+        return newPosition;
     }
 
     public PieceMoveKind getMoveKind() {
@@ -43,11 +43,11 @@ public class PieceMove {
     @Override
     public String toString() {
         if (moveKind == PieceMoveKind.MOVE)
-            return "(MOVE " + from + " -> " + to.get() + ")";
+            return "(MOVE " + position + " -> " + newPosition.get() + ")";
         else if (moveKind == PieceMoveKind.DISCARD)
-            return "(DISCARD " + piece.getPosition() + ")";
+            return "(DISCARD " + getPosition() + ")";
         else
-            return "(PROMOTE " + piece.getPosition() + ")";
+            return "(PROMOTE " + getPosition() + ")";
     }
 
     @Override
@@ -55,15 +55,15 @@ public class PieceMove {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PieceMove move = (PieceMove) o;
-        return piece.equals(move.piece) && to.equals(move.to);
+        return position.equals(move.getPosition()) && newPosition.equals(move.newPosition) && moveKind.equals(move.getMoveKind());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(piece, to);
+        return Objects.hash(position, newPosition, moveKind);
     }
 
-    public Position getFrom() {
-        return from;
+    public Position getPosition() {
+        return position;
     }
 }

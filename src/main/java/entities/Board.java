@@ -14,12 +14,28 @@ public class Board {
         boardListeners = new ArrayList<>();
     }
 
-    public void playMove(Move moves) {
-        for (var move : moves.getMoves()) {
-            var piece = getPieceOnPosition(move.getFrom()).get();
+    public void playMove(Move moves) throws UnknownError {
+        var sortedMoves = new ArrayList<>(moves.getMoves());
+
+        // do movements first, then discards and promotions
+        sortedMoves.sort((left, right) -> {
+            if (left.getMoveKind() == PieceMoveKind.MOVE)
+                return -1;
+            else if (right.getMoveKind() == PieceMoveKind.MOVE)
+                return 1;
+            return 0;
+        });
+
+        for (var move : sortedMoves) {
+            var optPiece = getPieceOnPosition(move.getPosition());
+
+            if (optPiece.isEmpty())
+                throw new UnknownError();
+
+            var piece = optPiece.get();
 
             if (move.getMoveKind() == PieceMoveKind.MOVE) {
-                var position = move.getTo().get();
+                var position = move.getNewPosition().get();
                 piece.setPosition(position);
 
                 for (var listener : boardListeners) {
@@ -29,7 +45,13 @@ public class Board {
                 for (var listener : boardListeners) {
                     listener.pieceRemoved(piece);
                 }
+
+                var previous = pieces.size();
                 pieces.remove(piece);
+                // piece removal check
+                if (pieces.size() + 1 != previous) {
+                    throw new UnknownError();
+                }
             } else if (move.getMoveKind() == PieceMoveKind.PROMOTE_INTO_QUEEN) {
                 for (var listener : boardListeners) {
                     listener.promoteIntoQueen(piece);
@@ -67,17 +89,24 @@ public class Board {
         var result = "";
 
         for (int j = 9; j >= 1; j--) {
+            result += j + " ";
             for (char i = 'a'; i < 'j'; i++) {
                 var piece = getPieceFromBoardPosition(i, j);
 
                 if (piece.isEmpty())
-                    result += " ";
+                    result += "  ";
                 else if (piece.get().getKind() == PieceKind.WHITE)
-                    result += "o";
+                    result += "o ";
                 else
-                    result += "x";
+                    result += "x ";
             }
             result += "\n";
+        }
+
+        result += "  ";
+
+        for (char i = 'a'; i < 'j'; i++) {
+            result += i + " ";
         }
 
         return result;

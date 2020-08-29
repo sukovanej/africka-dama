@@ -39,6 +39,8 @@ public class BestMoveLogic {
 
             if (alpha >= beta)
                 break;
+
+            newBoard = board.copy();
         }
 
         System.out.println("number of nodes: " + numberOfNodes.get());
@@ -52,16 +54,16 @@ public class BestMoveLogic {
             int depth,
             PieceKind player,
             AtomicInteger numberOfNodes) {
+        var endGameLogic = new EndGameLogic(board);
+
+        if (endGameLogic.isEndOfGame()) {
+            if (endGameLogic.getWinningPlayer().get() == PieceKind.WHITE)
+                return Float.POSITIVE_INFINITY;
+            else
+                return Float.NEGATIVE_INFINITY;
+        }
+
         if (depth == 0) {
-            var endGameLogic = new EndGameLogic(board);
-
-            if (endGameLogic.isEndOfGame()) {
-                if (endGameLogic.getWinningPlayer().get() == PieceKind.WHITE)
-                    return Float.POSITIVE_INFINITY;
-                else
-                    return Float.NEGATIVE_INFINITY;
-            }
-
             return calculateScore(board, player);
         }
 
@@ -88,6 +90,8 @@ public class BestMoveLogic {
 
             if (alpha >= beta)
                 break;
+
+            newBoard = board.copy();
         }
 
         return bestScore;

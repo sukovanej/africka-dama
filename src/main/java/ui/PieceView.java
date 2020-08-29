@@ -2,6 +2,7 @@ package ui;
 
 import entities.Piece;
 import entities.PieceKind;
+import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -66,6 +67,6 @@ public class PieceView {
     }
 
     public void remove() {
-        root.getChildren().remove(view);
+        Platform.runLater(() -> root.getChildren().remove(view));
     }
 }

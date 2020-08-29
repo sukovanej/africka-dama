@@ -221,28 +221,25 @@ public class TestPossibleMovesLogic {
 
         var possibleMoves = logic.getAllPossibleMoves(PieceKind.WHITE);
         assertEquals(possibleMoves.size(), 4);
-        System.out.println(board);
-
 
         board.playMove(
                 new Move(
                         PieceMove.Move(
                                 board.getPieceFromBoardPosition('e', 4).get(),
                                 Position.fromBoardPosition('e', 5))));
-        System.out.println(board);
 
         possibleMoves = logic.getAllPossibleMoves(PieceKind.BLACK);
+
         assertEquals(possibleMoves.size(), 2);
+        assertEquals(board.getPieces().size(), 80);
 
         var move = new Move(
                 PieceMove.Move(
                         board.getPieceFromBoardPosition('e', 6).get(),
                         Position.fromBoardPosition('e', 4)),
-                PieceMove.Discard(
-                        board.getPieceFromBoardPosition('e', 5).get()));
+                PieceMove.Discard(board.getPieceFromBoardPosition('e', 5).get()));
         board.playMove(move);
-
-        System.out.println(board);
+        assertEquals(board.getPieces().size(), 79);
 
         possibleMoves = logic.getAllPossibleMoves(PieceKind.WHITE);
         assertEquals(possibleMoves.size(), 2);
