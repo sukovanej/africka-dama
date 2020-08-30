@@ -58,4 +58,14 @@ public class Move {
     public int hashCode() {
         return Objects.hash(moves);
     }
+
+    public PieceKind getPlayer() {
+        return getPiece().getKind();
+    }
+
+    public Piece getPiece() {
+        // TODO: optimize by saving the piece, is it worth?
+        return moves.stream().filter(move -> move.getMoveKind() == PieceMoveKind.MOVE).findFirst().get()
+                .getPiece();
+    }
 }

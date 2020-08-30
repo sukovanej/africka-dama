@@ -21,7 +21,7 @@ public class GameController {
     private final BoardHistory boardHistory;
 
     private boolean isWhiteComputer = false;
-    private boolean isBlackComputer = false;
+    private boolean isBlackComputer = true;
     private int depth = 5;
 
     private PieceKind currentPlayer;
@@ -95,7 +95,6 @@ public class GameController {
 
             if (possibleJumpingMove.isPresent()) {
                 possibleMoves = possibleMovesPreviousPiece;
-                System.out.println("[Continuing jumping] New possible moves = " + possibleMoves);
 
                 if (isCurrentPlayerComputer())
                     playComputerMove();
@@ -106,7 +105,6 @@ public class GameController {
 
         currentPlayer = currentPlayer == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
         possibleMoves = logic.getAllPossibleMoves(currentPlayer);
-        System.out.println("[New move] New possible moves = " + possibleMoves);
 
         if (isCurrentPlayerComputer())
             playComputerMove();
@@ -146,10 +144,6 @@ public class GameController {
                     }
                 }
             }
-
-        System.out.println("didn't do a move, selected piece = " + selectedPiece +
-                ", position = " + position +
-                ", possible moves = " + possibleMoves);
     }
 
     private void sleep(int ms) {
@@ -163,14 +157,14 @@ public class GameController {
     private void playComputerMove() {
         new Thread(() -> {
             state.startComputerMove();
-            var bestMove = BestMoveLogic.getBestMove(board, depth, currentPlayer);
+            var bestMove = BestMoveLogic.getBestMove(board, depth, currentPlayer, possibleMoves);
 
             for (var move : bestMove.getMoves()) {
                 if (move.getMoveKind() == PieceMoveKind.MOVE) {
                     PieceView pieceView = null;
 
                     for (var _pieceView : view.getPieceViews()) {
-                        if (_pieceView.getPiece().getPosition().equals(move.getPosition()))
+                        if (_pieceView.getPiece() == move.getPiece())
                             pieceView = _pieceView;
                     }
 
@@ -194,21 +188,29 @@ public class GameController {
     }
 
     public void historyNext() {
-        System.out.println("History: next");
         boardHistory.next();
-
-        currentPlayer = boardHistory.getCurrentPlayer();
-        possibleMoves = logic.getAllPossibleMoves(currentPlayer);
-
-        state.reset();
+        historySync();
     }
 
     public void historyPrevious() {
-        System.out.println("History: previous");
         boardHistory.previous();
+        historySync();
+    }
 
+    private void historySync() {
         currentPlayer = boardHistory.getCurrentPlayer();
-        possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+        var previousMoveOpt = boardHistory.getPreviousMove();
+
+        if (previousMoveOpt.isPresent()) {
+            var previousMove = previousMoveOpt.get();
+
+            if (previousMove.getPlayer() == currentPlayer)
+                possibleMoves = logic.getPossibleMovesForPiece(previousMove.getPiece());
+            else
+                possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+        } else {
+            possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+        }
 
         state.reset();
     }

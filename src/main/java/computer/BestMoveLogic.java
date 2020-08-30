@@ -6,14 +6,18 @@ import entities.PieceKind;
 import logic.EndGameLogic;
 import logic.PossibleMovesLogic;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BestMoveLogic {
     public static Move getBestMove(Board board, int depth, PieceKind player) {
-        var numberOfNodes = new AtomicInteger(0);
-
         var logic = new PossibleMovesLogic(board);
         var possibleMoves = logic.getAllPossibleMoves(player);
+        return getBestMove(board, depth, player, possibleMoves);
+    }
+
+    public static Move getBestMove(Board board, int depth, PieceKind player, Set<Move> possibleMoves) {
+        var numberOfNodes = new AtomicInteger(0);
 
         var bestScore = player == PieceKind.WHITE ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
         Move bestMove = null;
@@ -26,7 +30,7 @@ public class BestMoveLogic {
             var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
             var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
 
-            if (isBetterMoveForPlayer(bestScore, newScore, player)) {
+            if (isBetterMoveForPlayer(bestScore, newScore, player) || bestMove == null) {
                 bestScore = newScore;
                 bestMove = move;
             }
