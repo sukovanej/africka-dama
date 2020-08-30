@@ -180,13 +180,10 @@ public class GameController {
 
                     sleep(100);
                     state.startMove(pieceView);
-                    System.out.println("[start] Computer clicked on " + pieceView.getPiece().getPosition().toString());
 
                     sleep(300);
                     state.makeMove(move.getNewPosition().get());
                     state.reset();
-
-                    System.out.println("[confirm] Computer clicked on " + move.getNewPosition().toString());
                 }
             }
             onComputerCalculationFinished.run();

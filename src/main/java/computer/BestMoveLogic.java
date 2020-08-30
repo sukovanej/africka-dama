@@ -27,12 +27,15 @@ public class BestMoveLogic {
         var alpha = Float.NEGATIVE_INFINITY;
         var beta = Float.POSITIVE_INFINITY;
         var newBoard = board.copy();
+        var logic = new PossibleMovesLogic(newBoard);
+
 
         for (Move move : possibleMoves) {
-            newBoard.playMove(move.convertToOtherBoard(newBoard));
+            var moveOnTheNewBoard = move.convertToOtherBoard(newBoard);
+            newBoard.playMove(moveOnTheNewBoard);
 
-            var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
-            var newScore = getBestMove(newBoard, alpha, beta, depth - 1, nextPlayer, numberOfNodes, move);
+            var nextPlayer = logic.getNextPlayer(moveOnTheNewBoard);
+            var newScore = getBestMove(newBoard, alpha, beta, depth - 1, nextPlayer, numberOfNodes, moveOnTheNewBoard);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player) || bestMove == null) {
                 bestScore = newScore;
@@ -44,7 +47,7 @@ public class BestMoveLogic {
             else
                 beta = Math.min(beta, bestScore);
 
-            newBoard.undoMove(move.convertToOtherBoard(newBoard));
+            newBoard.undoMove(moveOnTheNewBoard);
 
             if (alpha >= beta)
                 break;
@@ -84,7 +87,7 @@ public class BestMoveLogic {
             board.playMove(move);
             numberOfNodes.incrementAndGet();
 
-            var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
+            var nextPlayer = logic.getNextPlayer(move);
             var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes, move);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player))

@@ -62,7 +62,7 @@ public class Move {
 
     public PieceMove getPieceMove() {
         // TODO: optimize by saving the piece, is it worth?
-        return moves.stream().filter(move -> move.getMoveKind() == PieceMoveKind.MOVE).findFirst().get();
+       return moves.stream().filter(move -> move.getMoveKind() == PieceMoveKind.MOVE).findFirst().get();
     }
 
     public Piece getPiece() {
@@ -71,7 +71,7 @@ public class Move {
 
     public Move convertToOtherBoard(Board board) {
         var moves = new Move();
-        for (var move : moves.getMoves()) {
+        for (var move : this.moves) {
             moves.addPieceMove(move.convertToOtherBoard(board));
         }
         return moves;
