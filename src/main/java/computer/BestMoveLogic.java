@@ -6,8 +6,6 @@ import entities.PieceKind;
 import logic.EndGameLogic;
 import logic.PossibleMovesLogic;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,9 +17,8 @@ public class BestMoveLogic {
     }
 
     public static Move getBestMove(Board board, int depth, PieceKind player, Set<Move> possibleMoves) {
-        if (possibleMoves.size() == 1) {
+        if (possibleMoves.size() == 1)
             return possibleMoves.stream().findFirst().get();
-        }
 
         var numberOfNodes = new AtomicInteger(0);
 
@@ -31,22 +28,21 @@ public class BestMoveLogic {
         var beta = Float.POSITIVE_INFINITY;
         var newBoard = board.copy();
 
-        for (Move move : sortMovesFromBest(possibleMoves)) {
+        for (Move move : possibleMoves) {
             newBoard.playMove(move.convertToOtherBoard(newBoard));
 
             var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
-            var newScore = getBestMove(newBoard, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
+            var newScore = getBestMove(newBoard, alpha, beta, depth - 1, nextPlayer, numberOfNodes, move);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player) || bestMove == null) {
                 bestScore = newScore;
                 bestMove = move;
             }
 
-            if (player == PieceKind.WHITE) {
+            if (player == PieceKind.WHITE)
                 alpha = Math.max(alpha, bestScore);
-            } else {
+            else
                 beta = Math.min(beta, bestScore);
-            }
 
             newBoard.undoMove(move.convertToOtherBoard(newBoard));
 
@@ -64,7 +60,8 @@ public class BestMoveLogic {
             float beta,
             int depth,
             PieceKind player,
-            AtomicInteger numberOfNodes) {
+            AtomicInteger numberOfNodes,
+            Move previousMove) {
         var endGameLogic = new EndGameLogic(board);
 
         if (endGameLogic.isEndOfGame()) {
@@ -76,29 +73,27 @@ public class BestMoveLogic {
                 return Float.NEGATIVE_INFINITY;
         }
 
-        if (depth == 0) {
-            return calculateScore(board, player);
-        }
+        if (depth == 0)
+            return calculateScore(board);
 
         var logic = new PossibleMovesLogic(board);
-        var possibleMoves = logic.getAllPossibleMoves(player);
+        var possibleMoves = logic.getAllPossibleMoves(previousMove);
         var bestScore = player == PieceKind.WHITE ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
 
-        for (Move move : sortMovesFromBest(possibleMoves)) {
+        for (Move move : possibleMoves) {
             board.playMove(move);
             numberOfNodes.incrementAndGet();
 
             var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
-            var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
+            var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes, move);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player))
                 bestScore = newScore;
 
-            if (player == PieceKind.WHITE) {
+            if (player == PieceKind.WHITE)
                 alpha = Math.max(alpha, bestScore);
-            } else {
+            else
                 beta = Math.min(beta, bestScore);
-            }
 
             board.undoMove(move);
 
@@ -109,7 +104,7 @@ public class BestMoveLogic {
         return bestScore;
     }
 
-    private static float calculateScore(Board board, PieceKind player) {
+    public static float calculateScore(Board board) {
         float result = 0;
         for (var piece : board.getPieces()) {
             float pieceValue = piece.isQueen() ? 10 : 1;
@@ -125,17 +120,5 @@ public class BestMoveLogic {
     private static boolean isBetterMoveForPlayer(float currentRating, float newRating, PieceKind player) {
         return (player == PieceKind.WHITE && newRating > currentRating
                 || player == PieceKind.BLACK && newRating < currentRating);
-    }
-
-    private static List<Move> sortMovesFromBest(Set<Move> moves) {
-        var newMoves = new ArrayList<>(moves);
-        newMoves.sort((left, right) -> {
-            if (left.isQueenPromotion() && !right.isQueenPromotion() || left.isJumping() && !right.isJumping() && !right.isQueenPromotion())
-                return -1;
-            else if (right.isQueenPromotion() && !left.isQueenPromotion() || right.isJumping() && !left.isJumping() && !left.isQueenPromotion())
-                return 1;
-            return 0;
-        });
-        return newMoves;
     }
 }

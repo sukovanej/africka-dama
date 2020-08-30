@@ -53,4 +53,8 @@ public class PaneView {
     public Position getPosition() {
         return position;
     }
+
+    public void highlightComputerMove() {
+        pane.setFill(Color.LIGHTGREEN);
+    }
 }

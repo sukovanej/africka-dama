@@ -148,4 +148,24 @@ public class PossibleMovesLogic {
         else
             return jumps;
     }
+
+    public Set<Move> getAllPossibleMoves(Move previousMove) {
+        var nextPlayer = getNextPlayer(previousMove);
+        if (previousMove.getPlayer() == nextPlayer) {
+            return getPossibleMovesForPiece(previousMove.getPiece());
+        }
+        return getAllPossibleMoves(nextPlayer);
+    }
+
+    public PieceKind getNextPlayer(Move previousMove) {
+        if (previousMove.isJumping()) {
+            var movesForPiece = getPossibleMovesForPiece(previousMove.getPiece());
+
+            if (movesForPiece.stream().anyMatch(Move::isJumping)) {
+                return previousMove.getPlayer();
+            }
+        }
+
+        return previousMove.getPlayer() == PieceKind.WHITE ? PieceKind.BLACK : PieceKind.WHITE;
+    }
 }

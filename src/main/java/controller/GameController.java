@@ -7,11 +7,12 @@ import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import logic.EndGameLogic;
 import logic.PossibleMovesLogic;
-import ui.EndGameDialog;
 import ui.GameBoardView;
 import ui.PieceView;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class GameController {
     private final Board board;
@@ -22,13 +23,20 @@ public class GameController {
 
     private boolean isWhiteComputer = false;
     private boolean isBlackComputer = true;
-    private int depth = 8;
+    private int depth = 4;
 
     private PieceKind currentPlayer;
     private Piece selectedPiece;
     private Set<Move> possibleMoves;
+    private float currentRating;
 
     public final ViewState state;
+
+    // callbacks
+    public Runnable onRatingChanged;
+    public Runnable onComputerCalculationStarted;
+    public Runnable onComputerCalculationFinished;
+    public Consumer<Optional<PieceKind>> onEndOfGame;
 
     public GameController(Pane root) {
         board = BoardFactory.initializeBoard();
@@ -39,6 +47,7 @@ public class GameController {
 
         currentPlayer = PieceKind.WHITE;
         possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+        currentRating = BestMoveLogic.calculateScore(board);
 
         state = new ViewState();
         state.startMoveCallable = this::startMove;
@@ -71,7 +80,6 @@ public class GameController {
 
         if (piece.getKind() != currentPlayer) {
             Platform.runLater(state::reset);
-            System.out.println("this piece is not yours");
             return;
         }
 
@@ -105,6 +113,8 @@ public class GameController {
 
         currentPlayer = currentPlayer == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
         possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+        currentRating = BestMoveLogic.calculateScore(board);
+        onRatingChanged.run();
 
         if (isCurrentPlayerComputer())
             playComputerMove();
@@ -136,8 +146,7 @@ public class GameController {
                     boardHistory.movePlayed(move);
 
                     if (endGameLogic.isEndOfGame()) {
-                        var dialog = new EndGameDialog(endGameLogic.getWinningPlayer(), view.getRoot());
-                        dialog.show();
+                        onEndOfGame.accept(endGameLogic.getWinningPlayer());
                     } else {
                         switchPlayer(move);
                         return;
@@ -157,6 +166,7 @@ public class GameController {
     private void playComputerMove() {
         new Thread(() -> {
             state.startComputerMove();
+            onComputerCalculationStarted.run();
             var bestMove = BestMoveLogic.getBestMove(board, depth, currentPlayer, possibleMoves);
 
             for (var move : bestMove.getMoves()) {
@@ -179,6 +189,7 @@ public class GameController {
                     System.out.println("[confirm] Computer clicked on " + move.getNewPosition().toString());
                 }
             }
+            onComputerCalculationFinished.run();
             state.stopComputerMove();
         }).start();
     }
@@ -215,6 +226,25 @@ public class GameController {
         state.reset();
     }
 
+    public void showBestMove() {
+        new Thread(() -> {
+            onComputerCalculationStarted.run();
+
+            var bestMove = BestMoveLogic.getBestMove(board, depth, currentPlayer, possibleMoves);
+            var pieceMove = bestMove.getPieceMove();
+
+            var fromLocation = pieceMove.getPosition();
+            var toLocation = pieceMove.getNewPosition().get();
+
+            Platform.runLater(() -> {
+                view.getPaneView(fromLocation.getRow(), fromLocation.getColumn()).highlightComputerMove();
+                view.getPaneView(toLocation.getRow(), toLocation.getColumn()).highlightComputerMove();
+            });
+
+            onComputerCalculationFinished.run();
+        }).start();
+    }
+
     public BoardHistory getBoardHistory() {
         return boardHistory;
     }
@@ -225,5 +255,38 @@ public class GameController {
 
     public void recalculatePossibleMoves() {
         possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+    }
+
+    public boolean isWhiteComputer() {
+        return isWhiteComputer;
+    }
+
+    public void switchWhite() {
+        isWhiteComputer = !isWhiteComputer;
+        if (currentPlayer == PieceKind.WHITE && isCurrentPlayerComputer() && !state.isComputerPlaying())
+            playComputerMove();
+
+    }
+
+    public boolean isBlackComputer() {
+        return isBlackComputer;
+    }
+
+    public void switchBlack() {
+        isBlackComputer = !isBlackComputer;
+        if (currentPlayer == PieceKind.BLACK && isCurrentPlayerComputer() && !state.isComputerPlaying())
+            playComputerMove();
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public float getCurrentRating() {
+        return currentRating;
     }
 }

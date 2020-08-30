@@ -6,12 +6,10 @@ import entities.PieceKind;
 import java.util.Optional;
 
 public class EndGameLogic {
-    private Integer movesWithoutJump;
     private final Board board;
 
     public EndGameLogic(Board board) {
         this.board = board;
-        movesWithoutJump = 0;
     }
 
     public boolean isDraw() {

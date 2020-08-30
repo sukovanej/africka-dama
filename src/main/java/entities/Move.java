@@ -60,10 +60,13 @@ public class Move {
         return getPiece().getKind();
     }
 
-    public Piece getPiece() {
+    public PieceMove getPieceMove() {
         // TODO: optimize by saving the piece, is it worth?
-        return moves.stream().filter(move -> move.getMoveKind() == PieceMoveKind.MOVE).findFirst().get()
-                .getPiece();
+        return moves.stream().filter(move -> move.getMoveKind() == PieceMoveKind.MOVE).findFirst().get();
+    }
+
+    public Piece getPiece() {
+        return getPieceMove().getPiece();
     }
 
     public Move convertToOtherBoard(Board board) {
@@ -72,15 +75,6 @@ public class Move {
             moves.addPieceMove(move.convertToOtherBoard(board));
         }
         return moves;
-    }
-
-    public boolean isQueenPromotion() {
-        // TODO: could be slightly optimized by saving the value
-        for (var move : moves) {
-            if (move.getMoveKind() == PieceMoveKind.PROMOTE_INTO_QUEEN)
-                return true;
-        }
-        return false;
     }
 
     public String serialize() {
