@@ -122,7 +122,9 @@ public class GameController {
 
     private void reset() {
         view.resetView();
-        highlightPossibleMoves();
+
+        if (!endGameLogic.isEndOfGame())
+            highlightPossibleMoves();
     }
 
     private void highlightPossibleMoves() {
@@ -137,22 +139,22 @@ public class GameController {
     }
 
     private void makeMove(Position position) {
-        for (var move : possibleMoves)
-            for (var pieceMove : move.getMoves()) {
-                if (pieceMove.getMoveKind() == PieceMoveKind.MOVE
-                        && pieceMove.getNewPosition().get().equals(position)
-                        && pieceMove.getPosition().equals(selectedPiece.getPosition())) {
-                    board.playMove(move);
-                    boardHistory.movePlayed(move);
+        for (var move : possibleMoves) {
+            var pieceMove = move.getPieceMove();
+            if (pieceMove.getNewPosition().get().equals(position)
+                    && pieceMove.getPosition().equals(selectedPiece.getPosition())) {
+                board.playMove(move);
+                boardHistory.movePlayed(move);
 
-                    if (endGameLogic.isEndOfGame()) {
-                        onEndOfGame.accept(endGameLogic.getWinningPlayer());
-                    } else {
-                        switchPlayer(move);
-                        return;
-                    }
+                if (endGameLogic.isEndOfGame()) {
+                    onEndOfGame.accept(endGameLogic.getWinningPlayer());
+                    reset();
+                } else {
+                    switchPlayer(move);
                 }
+                return;
             }
+        }
     }
 
     private void sleep(int ms) {
@@ -173,10 +175,9 @@ public class GameController {
                 if (move.getMoveKind() == PieceMoveKind.MOVE) {
                     PieceView pieceView = null;
 
-                    for (var _pieceView : view.getPieceViews()) {
+                    for (var _pieceView : view.getPieceViews())
                         if (_pieceView.getPiece() == move.getPiece())
                             pieceView = _pieceView;
-                    }
 
                     sleep(100);
                     state.startMove(pieceView);
@@ -186,7 +187,10 @@ public class GameController {
                     state.reset();
                 }
             }
-            onComputerCalculationFinished.run();
+
+            if (!endGameLogic.isEndOfGame())
+                onComputerCalculationFinished.run();
+
             state.stopComputerMove();
         }).start();
     }
