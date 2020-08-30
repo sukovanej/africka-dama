@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Slider;
@@ -86,9 +87,10 @@ public class Main extends Application {
         topBox.setSpacing(20);
         var statusText = createStatusTextLabel(controller);
         var restartGameButton = createRestartGameButton(controller);
+        var helpButton = createHelpButton();
 
         topBox.setPadding(new Insets(0, 0, 20, 0));
-        topBox.getChildren().addAll(restartGameButton, statusText);
+        topBox.getChildren().addAll(helpButton, restartGameButton, statusText);
         root.setTop(topBox);
 
         primaryStage.widthProperty().addListener((x, y, z) -> controller.state.resetViewCallable.run());
@@ -240,6 +242,24 @@ public class Main extends Application {
         button.setOnMouseClicked(e -> {
             controller.restartGame();
         });
+        return button;
+    }
+
+    private Node createHelpButton() {
+        var button = new Button();
+        button.setText("Help!");
+
+        var alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Help");
+        alert.setHeaderText(null);
+        alert.setContentText("AFRICKA DAMA\n" +
+                "\n(By Milan Suk, 2020)\n\n" +
+                " - use LEFT / RIGHT ARROW for history\n" +
+                " - use slider in the bottom to change depth of the computer move calculation\n" +
+                " - click white / black button to change computer / player for a given color\n" +
+                " - enjoy! :)");
+
+        button.setOnMouseClicked(e -> alert.showAndWait());
         return button;
     }
 
