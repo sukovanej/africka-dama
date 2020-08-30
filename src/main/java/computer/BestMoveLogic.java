@@ -6,6 +6,8 @@ import entities.PieceKind;
 import logic.EndGameLogic;
 import logic.PossibleMovesLogic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,6 +19,10 @@ public class BestMoveLogic {
     }
 
     public static Move getBestMove(Board board, int depth, PieceKind player, Set<Move> possibleMoves) {
+        if (possibleMoves.size() == 1) {
+            return possibleMoves.stream().findFirst().get();
+        }
+
         var numberOfNodes = new AtomicInteger(0);
 
         var bestScore = player == PieceKind.WHITE ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
@@ -25,7 +31,7 @@ public class BestMoveLogic {
         var beta = Float.POSITIVE_INFINITY;
         var newBoard = board.copy();
 
-        for (Move move : possibleMoves) {
+        for (Move move : sortMovesFromBest(possibleMoves)) {
             newBoard.playMove(move.convertToOtherBoard(newBoard));
 
             var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
@@ -62,7 +68,9 @@ public class BestMoveLogic {
         var endGameLogic = new EndGameLogic(board);
 
         if (endGameLogic.isEndOfGame()) {
-            if (endGameLogic.getWinningPlayer().get() == PieceKind.WHITE)
+            if (endGameLogic.isDraw())
+                return 0;
+            else if (endGameLogic.getWinningPlayer().get() == PieceKind.WHITE)
                 return Float.POSITIVE_INFINITY;
             else
                 return Float.NEGATIVE_INFINITY;
@@ -76,7 +84,7 @@ public class BestMoveLogic {
         var possibleMoves = logic.getAllPossibleMoves(player);
         var bestScore = player == PieceKind.WHITE ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
 
-        for (Move move : possibleMoves) {
+        for (Move move : sortMovesFromBest(possibleMoves)) {
             board.playMove(move);
             numberOfNodes.incrementAndGet();
 
@@ -117,5 +125,17 @@ public class BestMoveLogic {
     private static boolean isBetterMoveForPlayer(float currentRating, float newRating, PieceKind player) {
         return (player == PieceKind.WHITE && newRating > currentRating
                 || player == PieceKind.BLACK && newRating < currentRating);
+    }
+
+    private static List<Move> sortMovesFromBest(Set<Move> moves) {
+        var newMoves = new ArrayList<>(moves);
+        newMoves.sort((left, right) -> {
+            if (left.isQueenPromotion() && !right.isQueenPromotion() || left.isJumping() && !right.isJumping() && !right.isQueenPromotion())
+                return -1;
+            else if (right.isQueenPromotion() && !left.isQueenPromotion() || right.isJumping() && !left.isJumping() && !left.isQueenPromotion())
+                return 1;
+            return 0;
+        });
+        return newMoves;
     }
 }

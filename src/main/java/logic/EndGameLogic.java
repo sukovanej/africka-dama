@@ -14,8 +14,8 @@ public class EndGameLogic {
         movesWithoutJump = 0;
     }
 
-    private boolean isDraw() {
-        return movesWithoutJump >= 30;
+    public boolean isDraw() {
+        return board.getNumberOfMovesWithoutJump() >= 30;
     }
 
     public boolean isEndOfGame() {

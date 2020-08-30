@@ -1,9 +1,6 @@
 package entities;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Move {
     final private Set<PieceMove> moves;
@@ -71,9 +68,38 @@ public class Move {
 
     public Move convertToOtherBoard(Board board) {
         var moves = new Move();
-        for (var move: moves.getMoves()) {
+        for (var move : moves.getMoves()) {
             moves.addPieceMove(move.convertToOtherBoard(board));
         }
         return moves;
+    }
+
+    public boolean isQueenPromotion() {
+        // TODO: could be slightly optimized by saving the value
+        for (var move : moves) {
+            if (move.getMoveKind() == PieceMoveKind.PROMOTE_INTO_QUEEN)
+                return true;
+        }
+        return false;
+    }
+
+    public String serialize() {
+        var joiner = new StringJoiner(";");
+
+        for (var move : moves) {
+            joiner.add(move.serialize());
+        }
+
+        return joiner.toString();
+    }
+
+    public static Move deserialize(String movesSerialized, Board board) {
+        var pieceMovesSerialized = movesSerialized.split(";");
+        var move = new Move();
+
+        for (var pieceMoveSerialized : pieceMovesSerialized)
+            move.addPieceMove(PieceMove.deserialize(pieceMoveSerialized, board));
+
+        return move;
     }
 }

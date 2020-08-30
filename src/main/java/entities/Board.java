@@ -7,13 +7,21 @@ import java.util.Set;
 public class Board {
     protected final Set<Piece> pieces;
     protected final Set<Piece> discardedPieces;
+    protected int numberOfMovesWithoutJump;
 
     public Board(Set<Piece> pieces) {
         this.pieces = pieces;
         this.discardedPieces = new HashSet<>();
+        this.numberOfMovesWithoutJump = 0;
     }
 
     public void playMove(Move moves) throws UnknownError {
+        if (moves.isJumping()) {
+            numberOfMovesWithoutJump = 0;
+        } else {
+            numberOfMovesWithoutJump++;
+        }
+
         for (var move : moves.getMoves()) {
             var piece = move.getPiece();
 
@@ -87,6 +95,12 @@ public class Board {
     }
 
     public void undoMove(Move moves) {
+        if (moves.isJumping()) {
+            numberOfMovesWithoutJump--;
+        } else {
+            numberOfMovesWithoutJump--;
+        }
+
         for (var move : moves.getMoves()) {
             var piece = move.getPiece();
 
@@ -124,5 +138,9 @@ public class Board {
         }
 
         return new Board(newPieces);
+    }
+
+    public int getNumberOfMovesWithoutJump() {
+        return numberOfMovesWithoutJump;
     }
 }

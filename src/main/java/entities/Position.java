@@ -52,4 +52,13 @@ public class Position {
     public int hashCode() {
         return Objects.hash(row, column);
     }
+
+    public String serialize() {
+        return row + ":" + column;
+    }
+
+    public static Position deserialize(String input) {
+        var values = input.split(":");
+        return new Position(Integer.parseInt(values[0]), Integer.parseInt(values[1]));
+    }
 }

@@ -34,7 +34,6 @@ public class PieceMove {
     public static PieceMove PromoteIntoQueen(Piece piece) {
         return new PieceMove(piece, Optional.empty(), PieceMoveKind.PROMOTE_INTO_QUEEN);
     }
-
     public Optional<Position> getNewPosition() {
         return newPosition;
     }
@@ -76,5 +75,25 @@ public class PieceMove {
 
     public PieceMove convertToOtherBoard(Board board) {
         return new PieceMove(board.getPieceOnPosition(piece.getPosition()).get(), position, newPosition, moveKind);
+    }
+
+    public String serialize() {
+        var newPositionSerialized = newPosition.isPresent() ? newPosition.get().serialize() : "NONE";
+        return position.serialize() + ',' + newPositionSerialized + ',' + moveKind;
+    }
+
+    public static PieceMove deserialize(String pieceMoveSerialized, Board board) {
+        var values = pieceMoveSerialized.split(",");
+        var position = Position.deserialize(values[0]);
+
+        Optional<Position> newPosition;
+        if (values[1].equals("NONE"))
+            newPosition = Optional.empty();
+        else
+            newPosition = Optional.of(Position.deserialize(values[1]));
+
+        var moveKind = PieceMoveKind.valueOf(values[2]);
+
+        return new PieceMove(board.getPieceOnPosition(position).get(), position, newPosition, moveKind);
     }
 }

@@ -22,7 +22,7 @@ public class GameController {
 
     private boolean isWhiteComputer = false;
     private boolean isBlackComputer = true;
-    private int depth = 10;
+    private int depth = 8;
 
     private PieceKind currentPlayer;
     private Piece selectedPiece;
@@ -213,5 +213,17 @@ public class GameController {
         }
 
         state.reset();
+    }
+
+    public BoardHistory getBoardHistory() {
+        return boardHistory;
+    }
+
+    public void setPlayer(PieceKind currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public void recalculatePossibleMoves() {
+        possibleMoves = logic.getAllPossibleMoves(currentPlayer);
     }
 }

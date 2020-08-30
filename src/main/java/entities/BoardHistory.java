@@ -2,9 +2,7 @@ package entities;
 
 import logic.PossibleMovesLogic;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class BoardHistory {
     private final Board board;
@@ -65,5 +63,26 @@ public class BoardHistory {
     public Optional<Move> getPreviousMove() {
         if (pointer <= 0) return Optional.empty();
         return Optional.of(movesHistory.get(pointer));
+    }
+
+    public String serialize() {
+        var joiner = new StringJoiner("\n");
+
+        for (var moves : movesHistory)
+            joiner.add(moves.serialize());
+
+        return joiner.toString();
+    }
+
+    public void load(Scanner scanner) {
+        // reset game
+        while (pointer > -1) previous();
+
+        while (scanner.hasNextLine()) {
+            var moveSerialized = scanner.nextLine();
+            var move = Move.deserialize(moveSerialized, board);
+            board.playMove(move);
+            movePlayed(move);
+        }
     }
 }
