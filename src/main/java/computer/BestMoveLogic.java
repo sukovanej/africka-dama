@@ -67,12 +67,13 @@ public class BestMoveLogic {
         var endGameLogic = new EndGameLogic(board);
 
         if (endGameLogic.isEndOfGame()) {
-            if (endGameLogic.isDraw())
-                return 0;
-            else if (endGameLogic.getWinningPlayer().get() == PieceKind.WHITE)
+            if (endGameLogic.isDraw()) {
+                return -1 * calculateScore(board);
+            } else if (endGameLogic.getWinningPlayer().get() == PieceKind.WHITE) {
                 return Float.POSITIVE_INFINITY;
-            else
+            } else {
                 return Float.NEGATIVE_INFINITY;
+            }
         }
 
         if (depth == 0)
@@ -110,7 +111,7 @@ public class BestMoveLogic {
     public static float calculateScore(Board board) {
         float result = 0;
         for (var piece : board.getPieces()) {
-            float pieceValue = piece.isQueen() ? 10 : 1;
+            float pieceValue = piece.isQueen() ? 40 : 1;
 
             if (piece.getKind() == PieceKind.WHITE)
                 result += pieceValue;

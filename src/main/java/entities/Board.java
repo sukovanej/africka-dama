@@ -143,4 +143,8 @@ public class Board {
     public int getNumberOfMovesWithoutJump() {
         return numberOfMovesWithoutJump;
     }
+
+    public void resetNumberOfMovesWithoutJump() {
+        numberOfMovesWithoutJump = 0;
+    }
 }

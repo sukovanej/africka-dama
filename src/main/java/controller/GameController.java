@@ -120,7 +120,7 @@ public class GameController {
             playComputerMove();
     }
 
-    private void reset() {
+    public void reset() {
         view.resetView();
 
         if (!endGameLogic.isEndOfGame())
@@ -244,6 +244,13 @@ public class GameController {
 
             onComputerCalculationFinished.run();
         }).start();
+    }
+
+    public void restartGame() {
+        boardHistory.restart();
+        currentPlayer = boardHistory.getCurrentPlayer();
+        possibleMoves = logic.getAllPossibleMoves(currentPlayer);
+        reset();
     }
 
     public BoardHistory getBoardHistory() {

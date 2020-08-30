@@ -82,14 +82,17 @@ public class Main extends Application {
         computerMovesBox.getChildren().addAll(ratingLabel, hintButton);
         controls.getChildren().add(computerMovesBox);
 
-        var statusTextBox = new HBox();
+        var topBox = new HBox();
+        topBox.setSpacing(20);
         var statusText = createStatusTextLabel(controller);
-        statusTextBox.setPadding(new Insets(0, 0, 20, 0));
-        statusTextBox.getChildren().add(statusText);
-        root.setTop(statusTextBox);
+        var restartGameButton = createRestartGameButton(controller);
 
-        primaryStage.widthProperty().addListener((x, y, z) -> controller.state.reset());
-        primaryStage.heightProperty().addListener((x, y, z) -> controller.state.reset());
+        topBox.setPadding(new Insets(0, 0, 20, 0));
+        topBox.getChildren().addAll(restartGameButton, statusText);
+        root.setTop(topBox);
+
+        primaryStage.widthProperty().addListener((x, y, z) -> controller.state.resetViewCallable.run());
+        primaryStage.heightProperty().addListener((x, y, z) -> controller.state.resetViewCallable.run());
 
         primaryStage.show();
     }
@@ -229,6 +232,15 @@ public class Main extends Application {
             else if (e.getCode() == KeyCode.LEFT)
                 controller.historyPrevious();
         };
+    }
+
+    private Node createRestartGameButton(GameController controller) {
+        var button = new Button();
+        button.setText("New game");
+        button.setOnMouseClicked(e -> {
+            controller.restartGame();
+        });
+        return button;
     }
 
     public static void main(String args[]) {

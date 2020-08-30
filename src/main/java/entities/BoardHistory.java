@@ -75,8 +75,7 @@ public class BoardHistory {
     }
 
     public void load(Scanner scanner) {
-        // reset game
-        while (pointer > -1) previous();
+        restart();
 
         while (scanner.hasNextLine()) {
             var moveSerialized = scanner.nextLine();
@@ -84,5 +83,12 @@ public class BoardHistory {
             board.playMove(move);
             movePlayed(move);
         }
+    }
+
+    public void restart() {
+        // reset game
+        while (pointer > -1) previous();
+        board.resetNumberOfMovesWithoutJump();
+        movesHistory.clear();
     }
 }
