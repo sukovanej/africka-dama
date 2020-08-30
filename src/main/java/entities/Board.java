@@ -133,7 +133,7 @@ public class Board {
     public Board copy() {
         var newPieces = new HashSet<Piece>();
 
-        for (var piece: pieces) {
+        for (var piece : pieces) {
             newPieces.add(piece.copy());
         }
 

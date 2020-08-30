@@ -13,7 +13,7 @@ public class BoardFactory {
     public static Set<Piece> initializePieces() {
         var pieces = new HashSet<Piece>();
 
-        for (int row = 0; row < 9; row ++)
+        for (int row = 0; row < 9; row++)
             for (int column = 0; column < 9; column++) {
                 if (column == 4 && row == 4) continue; // skip the center which doesn't contain any piece
 

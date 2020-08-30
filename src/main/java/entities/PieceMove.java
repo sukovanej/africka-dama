@@ -34,6 +34,7 @@ public class PieceMove {
     public static PieceMove PromoteIntoQueen(Piece piece) {
         return new PieceMove(piece, Optional.empty(), PieceMoveKind.PROMOTE_INTO_QUEEN);
     }
+
     public Optional<Position> getNewPosition() {
         return newPosition;
     }

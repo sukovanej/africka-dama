@@ -29,7 +29,6 @@ public class BestMoveLogic {
         var newBoard = board.copy();
         var logic = new PossibleMovesLogic(newBoard);
 
-
         for (Move move : possibleMoves) {
             var moveOnTheNewBoard = move.convertToOtherBoard(newBoard);
             newBoard.playMove(moveOnTheNewBoard);
@@ -82,13 +81,14 @@ public class BestMoveLogic {
         var logic = new PossibleMovesLogic(board);
         var possibleMoves = logic.getAllPossibleMoves(previousMove);
         var bestScore = player == PieceKind.WHITE ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
+        var nextDepth = possibleMoves.size() == 1 ? depth : depth - 1;
 
         for (Move move : possibleMoves) {
             board.playMove(move);
             numberOfNodes.incrementAndGet();
 
             var nextPlayer = logic.getNextPlayer(move);
-            var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes, move);
+            var newScore = getBestMove(board, alpha, beta, nextDepth, nextPlayer, numberOfNodes, move);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player))
                 bestScore = newScore;

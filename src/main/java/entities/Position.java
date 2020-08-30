@@ -20,7 +20,7 @@ public class Position {
     }
 
     public static Position fromBoardPosition(char column, int row) {
-        return new Position( row - 1, column - 'a');
+        return new Position(row - 1, column - 'a');
     }
 
     public PositionDiff diff(Position right) {

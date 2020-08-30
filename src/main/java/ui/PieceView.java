@@ -14,7 +14,7 @@ public class PieceView {
 
     private boolean visible;
 
-    public PieceView (Pane root, Piece piece) {
+    public PieceView(Pane root, Piece piece) {
         this.piece = piece;
         this.root = root;
         this.view = new Circle();

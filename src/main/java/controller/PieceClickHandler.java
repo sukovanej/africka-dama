@@ -2,7 +2,6 @@ package controller;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-
 import ui.PieceView;
 
 public class PieceClickHandler implements EventHandler<MouseEvent> {
