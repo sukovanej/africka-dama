@@ -9,6 +9,13 @@ public class PieceMove {
     private final Optional<Position> newPosition;
     private final PieceMoveKind moveKind;
 
+    private PieceMove(Piece piece, Position position, Optional<Position> newPosition, PieceMoveKind moveKind) {
+        this.piece = piece;
+        this.position = position;
+        this.newPosition = newPosition;
+        this.moveKind = moveKind;
+    }
+
     private PieceMove(Piece piece, Optional<Position> newPosition, PieceMoveKind moveKind) {
         this.piece = piece;
         this.position = piece.getPosition();
@@ -65,5 +72,9 @@ public class PieceMove {
 
     public Piece getPiece() {
         return piece;
+    }
+
+    public PieceMove convertToOtherBoard(Board board) {
+        return new PieceMove(board.getPieceOnPosition(piece.getPosition()).get(), position, newPosition, moveKind);
     }
 }

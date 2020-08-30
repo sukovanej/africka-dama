@@ -22,7 +22,7 @@ public class GameController {
 
     private boolean isWhiteComputer = false;
     private boolean isBlackComputer = true;
-    private int depth = 5;
+    private int depth = 10;
 
     private PieceKind currentPlayer;
     private Piece selectedPiece;

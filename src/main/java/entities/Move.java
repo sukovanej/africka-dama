@@ -68,4 +68,12 @@ public class Move {
         return moves.stream().filter(move -> move.getMoveKind() == PieceMoveKind.MOVE).findFirst().get()
                 .getPiece();
     }
+
+    public Move convertToOtherBoard(Board board) {
+        var moves = new Move();
+        for (var move: moves.getMoves()) {
+            moves.addPieceMove(move.convertToOtherBoard(board));
+        }
+        return moves;
+    }
 }

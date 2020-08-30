@@ -115,4 +115,14 @@ public class Board {
     public Set<Piece> getDiscardedPieces() {
         return discardedPieces;
     }
+
+    public Board copy() {
+        var newPieces = new HashSet<Piece>();
+
+        for (var piece: pieces) {
+            newPieces.add(piece.copy());
+        }
+
+        return new Board(newPieces);
+    }
 }

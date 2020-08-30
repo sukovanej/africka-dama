@@ -23,12 +23,13 @@ public class BestMoveLogic {
         Move bestMove = null;
         var alpha = Float.NEGATIVE_INFINITY;
         var beta = Float.POSITIVE_INFINITY;
+        var newBoard = board.copy();
 
         for (Move move : possibleMoves) {
-            board.playMove(move);
+            newBoard.playMove(move.convertToOtherBoard(newBoard));
 
             var nextPlayer = player == PieceKind.BLACK ? PieceKind.WHITE : PieceKind.BLACK;
-            var newScore = getBestMove(board, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
+            var newScore = getBestMove(newBoard, alpha, beta, depth - 1, nextPlayer, numberOfNodes);
 
             if (isBetterMoveForPlayer(bestScore, newScore, player) || bestMove == null) {
                 bestScore = newScore;
@@ -41,7 +42,7 @@ public class BestMoveLogic {
                 beta = Math.min(beta, bestScore);
             }
 
-            board.undoMove(move);
+            newBoard.undoMove(move.convertToOtherBoard(newBoard));
 
             if (alpha >= beta)
                 break;
