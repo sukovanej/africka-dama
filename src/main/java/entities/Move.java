@@ -96,4 +96,8 @@ public class Move {
 
         return move;
     }
+
+    public boolean isQueenPromotion() {
+        return moves.stream().anyMatch(m -> m.getMoveKind() == PieceMoveKind.PROMOTE_INTO_QUEEN);
+    }
 }

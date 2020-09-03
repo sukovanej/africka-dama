@@ -37,6 +37,7 @@ public class GameController {
     public Runnable onComputerCalculationStarted;
     public Runnable onComputerCalculationFinished;
     public Consumer<Optional<PieceKind>> onEndOfGame;
+    public Consumer<Optional<PieceKind>> onEndOfGameMovementAttempt;
 
     public GameController(Pane root) {
         board = BoardFactory.initializeBoard();
@@ -75,6 +76,11 @@ public class GameController {
     }
 
     private void startMove(PieceView pieceView) {
+        if (endGameLogic.isEndOfGame()) {
+            Platform.runLater(state::reset);
+            return;
+        }
+
         selectedPiece = pieceView.getPiece();
         var piece = pieceView.getPiece();
 
@@ -125,6 +131,8 @@ public class GameController {
 
         if (!endGameLogic.isEndOfGame())
             highlightPossibleMoves();
+        else
+            onEndOfGameMovementAttempt.accept(endGameLogic.getWinningPlayer());
     }
 
     private void highlightPossibleMoves() {

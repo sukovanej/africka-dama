@@ -99,6 +99,17 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    private static String getEndGameText(Optional<PieceKind> winnerOpt) {
+        if (winnerOpt.isEmpty()) {
+            return "Draw!";
+        } else {
+            if (winnerOpt.get() == PieceKind.BLACK)
+                return "Black won!";
+            else
+                return "White won!";
+        }
+    }
+
     private Node createStatusTextLabel(GameController controller) {
         var status = new Text();
         status.setText("Started");
@@ -110,16 +121,10 @@ public class Main extends Application {
             status.setText("Computer calculation finished");
         };
         controller.onEndOfGame = (Optional<PieceKind> winnerOpt) -> {
-            if (winnerOpt.isEmpty()) {
-                status.setText("Draw");
-            } else {
-                var winner = winnerOpt.get();
-
-                if (winner == PieceKind.BLACK)
-                    status.setText("Black won!");
-                else
-                    status.setText("White won!");
-            }
+            status.setText(getEndGameText(winnerOpt));
+        };
+        controller.onEndOfGameMovementAttempt = (Optional<PieceKind> winnerOpt) -> {
+            status.setText(getEndGameText(winnerOpt) + " Start a new game");
         };
 
         return status;
@@ -163,9 +168,10 @@ public class Main extends Application {
                 try {
                     var scanner = new Scanner(file);
                     controller.getBoardHistory().load(scanner);
-                    controller.setPlayer(controller.getBoardHistory().getCurrentPlayer());
+                    var currentPlayer = controller.getBoardHistory().getCurrentPlayer();
+                    controller.setPlayer(currentPlayer);
                     controller.recalculatePossibleMoves();
-                    controller.state.reset();
+                    controller.reset();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }

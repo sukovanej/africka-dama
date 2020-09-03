@@ -95,11 +95,7 @@ public class Board {
     }
 
     public void undoMove(Move moves) {
-        if (moves.isJumping()) {
-            numberOfMovesWithoutJump--;
-        } else {
-            numberOfMovesWithoutJump--;
-        }
+        numberOfMovesWithoutJump--;
 
         for (var move : moves.getMoves()) {
             var piece = move.getPiece();

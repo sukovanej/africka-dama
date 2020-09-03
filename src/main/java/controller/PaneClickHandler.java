@@ -15,6 +15,9 @@ public class PaneClickHandler implements EventHandler<MouseEvent> {
 
     @Override
     public void handle(MouseEvent event) {
+        if (state.isComputerPlaying())
+            return;
+
         if (state.isStartMove()) {
             state.makeMove(position);
         }

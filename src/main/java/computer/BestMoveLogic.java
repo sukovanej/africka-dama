@@ -52,7 +52,6 @@ public class BestMoveLogic {
                 break;
         }
 
-        System.out.println("number of nodes: " + numberOfNodes.get());
         return bestMove;
     }
 

@@ -27,7 +27,6 @@ public class BoardHistory {
         if (pointer == movesHistory.size() - 1) return;
         pointer++;
         board.playMove(movesHistory.get(pointer));
-        System.out.println("[History:Next] Playing " + movesHistory.get(pointer));
     }
 
     public void previous() {

@@ -46,8 +46,8 @@ public class ViewState {
     }
 
     public void makeMove(Position position) {
-        state = ViewStateEnum.NONE;
         makeMoveCallable.accept(position);
+        state = ViewStateEnum.NONE;
     }
 
     public void startComputerMove() {
